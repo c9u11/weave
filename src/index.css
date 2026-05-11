@@ -69,4 +69,67 @@
   .input {
     @apply w-full bg-surface-alt border border-border rounded-md px-4 py-3 text-[15px] text-primary placeholder:text-muted focus:outline-none focus:border-primary transition-colors;
   }
+
+  /* ============= Markdown ============= */
+  .markdown {
+    @apply text-primary text-[15px] leading-relaxed;
+  }
+  .markdown > * + * { @apply mt-4; }
+  .markdown h1 {
+    @apply text-3xl font-bold tracking-tighter mt-10 mb-4 pb-3 border-b border-border;
+  }
+  .markdown h1:first-child { @apply mt-0; }
+  .markdown h2 {
+    @apply text-2xl font-bold tracking-tighter mt-10 mb-3;
+  }
+  .markdown h3 {
+    @apply text-lg font-bold tracking-tight mt-6 mb-2;
+  }
+  .markdown h4 {
+    @apply text-[15px] font-bold mt-4 mb-1;
+  }
+  .markdown p {
+    @apply leading-relaxed;
+  }
+  .markdown a {
+    @apply text-accent font-semibold underline-offset-2 hover:underline;
+  }
+  .markdown strong { @apply font-bold text-primary; }
+  .markdown em { @apply italic; }
+  .markdown code {
+    @apply bg-surface px-1.5 py-0.5 rounded-sm text-[13px] font-mono text-accent border border-border;
+  }
+  .markdown pre {
+    @apply bg-surface border border-border rounded-md p-4 overflow-x-auto my-4;
+  }
+  .markdown pre code {
+    @apply bg-transparent border-0 p-0 text-primary text-[13px] leading-relaxed;
+  }
+  .markdown ul, .markdown ol {
+    @apply pl-6 space-y-1;
+  }
+  .markdown ul { @apply list-disc; }
+  .markdown ol { @apply list-decimal; }
+  .markdown li::marker { @apply text-muted; }
+  .markdown blockquote {
+    @apply border-l-4 border-accent-soft bg-surface pl-4 pr-3 py-3 my-4 rounded-r-md text-muted;
+  }
+  .markdown blockquote > * { @apply text-muted; }
+  .markdown blockquote strong { @apply text-primary; }
+  .markdown table {
+    @apply w-full text-[13px] border-collapse my-4;
+  }
+  .markdown th, .markdown td {
+    @apply border border-border px-3 py-2 text-left align-top;
+  }
+  .markdown th {
+    @apply bg-surface font-bold text-primary;
+  }
+  .markdown td { @apply text-primary/90; }
+  .markdown hr {
+    @apply border-0 border-t border-border my-8;
+  }
+  .markdown img {
+    @apply max-w-full rounded-md my-4 border border-border;
+  }
 }
