@@ -7,6 +7,7 @@ import Flow from './pages/Flow';
 
 // Prototype screens
 import Launcher from './pages/prototype/Launcher';
+import Splash from './pages/prototype/Splash';
 import Landing from './pages/prototype/Landing';
 import Onboarding from './pages/prototype/Onboarding';
 import PlanSelect from './pages/prototype/PlanSelect';
@@ -33,6 +34,7 @@ function App() {
 
         {/* Prototype */}
         <Route path="/prototype" element={<Launcher />} />
+        <Route path="/prototype/splash" element={<Splash />} />
         <Route path="/prototype/landing" element={<Landing />} />
         <Route path="/prototype/onboarding" element={<Onboarding />} />
         <Route path="/prototype/plan" element={<PlanSelect />} />

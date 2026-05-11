@@ -378,6 +378,7 @@ export const notifications: NotificationItem[] = [
 
 // 화면 리스트 (런처용)
 export const screenList = [
+  { num: '00', path: '/prototype/splash', name: '스플래시', desc: '0 → W → 1 로고 애니메이션', star: true },
   { num: '01', path: '/prototype/landing', name: 'Landing', desc: '서비스 소개 + 카카오 로그인' },
   { num: '03', path: '/prototype/onboarding', name: '온보딩', desc: '프로젝트 유형 → 정보 → 팀 설정' },
   { num: '04', path: '/prototype/plan', name: '결제 플랜 선택', desc: 'Free / Plus / Pro 비교' },
