@@ -1,12 +1,49 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mic, Image as ImageIcon, Sparkles } from 'lucide-react';
+import { Mic, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
 import { Button } from '../../components/ui/Button';
+
+const gradients = [
+  'linear-gradient(135deg, #FCD34D55, #FB923C55)',
+  'linear-gradient(135deg, #34D39955, #FCD34D55)',
+  'linear-gradient(135deg, #A78BFA55, #B4530955)',
+  'linear-gradient(135deg, #FB923C55, #A78BFA55)',
+  'linear-gradient(135deg, #F8717155, #FB923C55)',
+];
+
+const emojis = ['💡', '🚀', '🎯', '⚡', '🔥', '✨', '🌟', '💫'];
 
 export default function IdeaNew() {
   const navigate = useNavigate();
   const [text, setText] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const submit = () => {
+    if (!text.trim()) return;
+    setSubmitting(true);
+
+    // Mock AI organize delay
+    setTimeout(() => {
+      const newIdea = {
+        id: `new-${Date.now()}`,
+        authorId: 'me',
+        authorName: '나',
+        authorColor: '#1E1B4B',
+        title: text.split('\n')[0].slice(0, 24) || '새 아이디어',
+        emoji: emojis[Math.floor(Math.random() * emojis.length)],
+        gradient: gradients[Math.floor(Math.random() * gradients.length)],
+        rawText: text,
+        rating: 0,
+        commentsCount: 0,
+      };
+
+      const existing = JSON.parse(sessionStorage.getItem('weave:newIdeas') || '[]');
+      sessionStorage.setItem('weave:newIdeas', JSON.stringify([...existing, newIdea]));
+
+      navigate('/prototype/ideas');
+    }, 900);
+  };
 
   return (
     <PrototypeLayout>
@@ -24,6 +61,7 @@ export default function IdeaNew() {
         rows={10}
         value={text}
         onChange={(e) => setText(e.target.value)}
+        disabled={submitting}
         placeholder='"배달앱이 너무 많아서 뭘 시킬지 모르겠음. 친구들이랑 같이 고르면 좋겠는데 카톡으로 하기 귀찮음..."'
         className="input"
       />
@@ -41,11 +79,12 @@ export default function IdeaNew() {
         variant="primary"
         fullWidth
         size="lg"
-        leftIcon={<Sparkles size={16} />}
+        disabled={!text.trim() || submitting}
+        leftIcon={submitting ? <Loader2 size={16} className="animate-spin" /> : <Sparkles size={16} />}
         className="mt-6"
-        onClick={() => navigate('/prototype/ideas')}
+        onClick={submit}
       >
-        AI 정리하고 제출
+        {submitting ? 'AI가 정리 중...' : 'AI 정리하고 제출'}
       </Button>
 
       <p className="text-[11px] text-muted text-center mt-3">

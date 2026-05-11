@@ -1,7 +1,7 @@
 // Mock data for the Weave prototype demo
 
 export type PersonaKey = 'user' | 'skeptic' | 'realist' | 'judge';
-export type Stage = 'collect' | 'review' | 'feedback' | 'mediate' | 'brief';
+export type Stage = 'collect' | 'review' | 'feedback' | 'vote' | 'mediate' | 'brief';
 export type Plan = 'free' | 'plus' | 'pro';
 
 export interface TeamMember {
@@ -67,8 +67,32 @@ export interface NotificationItem {
 export const team = {
   name: '멋사 아이디어톤 - 우리 팀',
   daysLeft: 7,
-  stage: 'feedback' as Stage,
+  stage: 'vote' as Stage,
   plan: 'plus' as Plan,
+};
+
+// 투표 기준 (대회 심사 기준에서 따옴)
+export const voteCriteria = [
+  { key: 'overall', label: '종합', desc: '전반적으로 가장 좋은 아이디어' },
+  { key: 'feasibility', label: '실현 가능성', desc: '우리 팀이 실제로 만들 수 있는' },
+  { key: 'pitch', label: '발표 가능성', desc: '심사위원에게 잘 전달될' },
+  { key: 'unique', label: '차별성', desc: '기존 서비스와 가장 다른' },
+];
+
+// 사전 투표 결과 (mock)
+export const initialVotes: Record<string, number> = {
+  i1: 1,
+  i2: 0,
+  i3: 1,
+  i4: 0,
+};
+
+// 현재 로그인 사용자 (mock)
+export const currentUser = {
+  id: 'me',
+  name: '나',
+  initial: '나',
+  color: '#1E1B4B',
 };
 
 export const members: TeamMember[] = [
@@ -278,7 +302,8 @@ export const screenList = [
   { num: '08', path: '/prototype/idea/new', name: 'F1 자유 입력', desc: '두서없이 아이디어 작성' },
   { num: '09', path: '/prototype/ideas', name: '아이디어 모아보기', desc: '카드 그리드 (AI 이미지 썸네일)' },
   { num: '10', path: '/prototype/idea/i1', name: '아이디어 상세', desc: 'AI 정리 + 페르소나 + 댓글', star: true },
-  { num: '11', path: '/prototype/mediate', name: 'AI 충돌 중재', desc: '합의/충돌 분리', star: true },
-  { num: '12', path: '/prototype/brief', name: '최종 기획안', desc: '1페이지 + Export' },
-  { num: '13', path: '/prototype/notifications', name: '알림', desc: '댓글·평가·AI 알림' },
+  { num: '11', path: '/prototype/vote', name: '투표', desc: '최종 아이디어 선정 (4가지 기준)' },
+  { num: '12', path: '/prototype/mediate', name: 'AI 충돌 중재', desc: '선정된 아이디어의 합의/충돌 분리', star: true },
+  { num: '13', path: '/prototype/brief', name: '최종 기획안', desc: '1페이지 + Export' },
+  { num: '14', path: '/prototype/notifications', name: '알림', desc: '댓글·평가·AI 알림' },
 ];

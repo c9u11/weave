@@ -10,10 +10,11 @@ const stageLabels = {
   collect: '아이디어 모집',
   review: 'AI 정리·페르소나',
   feedback: '팀원 피드백',
+  vote: '투표',
   mediate: 'AI 충돌 중재',
   brief: '최종 기획안',
 };
-const stageOrder: (keyof typeof stageLabels)[] = ['collect', 'review', 'feedback', 'mediate', 'brief'];
+const stageOrder: (keyof typeof stageLabels)[] = ['collect', 'review', 'feedback', 'vote', 'mediate', 'brief'];
 
 export default function TeamHome() {
   const navigate = useNavigate();

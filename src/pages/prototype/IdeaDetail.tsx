@@ -1,11 +1,12 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
+import type { KeyboardEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Sparkles, RotateCw, ArrowLeft, MessageSquare, Bot, Star, ThumbsUp, ArrowRight, AtSign } from 'lucide-react';
+import { Sparkles, RotateCw, ArrowLeft, MessageSquare, Bot, Star, ThumbsUp, ArrowRight, AtSign, Send } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
 import { Button } from '../../components/ui/Button';
 import { Avatar } from '../../components/ui/Avatar';
 import { Badge } from '../../components/ui/Badge';
-import { ideas } from '../../prototype/data';
+import { ideas, currentUser, type Comment } from '../../prototype/data';
 
 const organizeKeys = [
   { key: 'problem' as const, label: '문제 정의' },
@@ -21,6 +22,19 @@ export default function IdeaDetail() {
   const idea = ideas.find((i) => i.id === id);
   const [tab, setTab] = useState<'persona' | 'comments'>('persona');
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
+  const [comments, setComments] = useState<Comment[]>(idea?.comments ?? []);
+  const [draft, setDraft] = useState('');
+
+  const commentsByTarget = useMemo(
+    () =>
+      comments.reduce<Record<string, Comment[]>>((acc, c) => {
+        const key = c.target || '_general';
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(c);
+        return acc;
+      }, {}),
+    [comments]
+  );
 
   if (!idea) {
     return (
@@ -32,12 +46,28 @@ export default function IdeaDetail() {
     );
   }
 
-  const commentsByTarget = idea.comments.reduce<Record<string, typeof idea.comments>>((acc, c) => {
-    const key = c.target || '_general';
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(c);
-    return acc;
-  }, {});
+  const submitComment = () => {
+    const text = draft.trim();
+    if (!text) return;
+    const newComment: Comment = {
+      id: `c-${Date.now()}`,
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorColor: currentUser.color,
+      target: activeTarget || undefined,
+      text,
+      time: '방금',
+    };
+    setComments((prev) => [newComment, ...prev]);
+    setDraft('');
+  };
+
+  const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      submitComment();
+    }
+  };
 
   return (
     <PrototypeLayout wide showBell bellCount={3}>
@@ -159,7 +189,7 @@ export default function IdeaDetail() {
                     : 'text-muted hover:text-primary'
                 }`}
               >
-                <MessageSquare size={14} /> 댓글 ({idea.comments.length})
+                <MessageSquare size={14} /> 댓글 ({comments.length})
               </button>
             </div>
 
@@ -183,12 +213,12 @@ export default function IdeaDetail() {
 
               {tab === 'comments' && (
                 <>
-                  {idea.comments.length === 0 ? (
+                  {comments.length === 0 ? (
                     <p className="text-center text-[12px] text-muted py-8">
-                      아직 댓글이 없어요
+                      아직 댓글이 없어요. 첫 댓글을 달아보세요.
                     </p>
                   ) : (
-                    idea.comments.map((c) => (
+                    comments.map((c) => (
                       <div
                         key={c.id}
                         className={`mb-3 last:mb-0 bg-paper border rounded-md p-3 transition-all ${
@@ -223,11 +253,37 @@ export default function IdeaDetail() {
                     ))
                   )}
 
-                  <div className="mt-4 pt-3 border-t border-border">
-                    <input
-                      placeholder={activeTarget ? `"${activeTarget}"에 댓글 달기...` : '댓글 추가...'}
-                      className="input !py-2 !text-[12px]"
-                    />
+                  <div className="mt-4 pt-3 border-t border-border space-y-2">
+                    {activeTarget && (
+                      <div className="flex items-center gap-1.5 text-[11px] text-accent font-bold">
+                        <AtSign size={10} />
+                        "{activeTarget}"에 댓글 달기
+                        <button
+                          onClick={() => setActiveTarget(null)}
+                          className="ml-auto text-muted hover:text-primary"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <input
+                        value={draft}
+                        onChange={(e) => setDraft(e.target.value)}
+                        onKeyDown={onKey}
+                        placeholder={activeTarget ? `"${activeTarget}" 에 의견을...` : '댓글 추가... (Enter)'}
+                        className="input !py-2 !text-[12px] flex-1"
+                      />
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={submitComment}
+                        disabled={!draft.trim()}
+                        className="!px-3"
+                      >
+                        <Send size={13} />
+                      </Button>
+                    </div>
                   </div>
                 </>
               )}

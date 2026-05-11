@@ -1,7 +1,9 @@
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, AlertTriangle, Bot, ArrowRight, MessageSquare } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, Bot, ArrowRight, MessageSquare, Trophy } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
 import { Button } from '../../components/ui/Button';
+import { Badge } from '../../components/ui/Badge';
+import { ideas } from '../../prototype/data';
 
 const agreed = [
   { item: '문제 정의', detail: '친구들과 메뉴 합의가 번거롭다', votes: 3 },
@@ -30,16 +32,36 @@ const conflicts = [
 
 export default function Mediate() {
   const navigate = useNavigate();
+  const winnerId = typeof window !== 'undefined' ? sessionStorage.getItem('weave:winnerIdeaId') : null;
+  const winner = ideas.find((i) => i.id === winnerId) || ideas[0];
 
   return (
     <PrototypeLayout>
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
-        4단계 — AI 충돌 중재
+        5단계 — AI 충돌 중재
       </p>
       <h1 className="text-2xl font-bold tracking-tighter text-primary">팀의 결론</h1>
-      <p className="text-[14px] text-muted mt-2 mb-6">
+      <p className="text-[14px] text-muted mt-2 mb-5">
         AI가 팀원 의견을 분석해 합의된 부분과 충돌하는 부분을 자동 분리했어요.
       </p>
+
+      {/* Winner card */}
+      <div className="bg-surface border-2 border-accent rounded-lg overflow-hidden mb-6 flex items-center gap-3 p-3">
+        <div
+          className="w-16 h-16 rounded-md flex items-center justify-center text-3xl flex-shrink-0"
+          style={{ background: winner.gradient }}
+        >
+          {winner.emoji}
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <Trophy size={14} className="text-accent" />
+            <Badge variant="accent">투표 1위</Badge>
+          </div>
+          <div className="text-[15px] font-bold text-primary tracking-tight mt-1">{winner.title}</div>
+          <div className="text-[11px] text-muted">👤 {winner.authorName}</div>
+        </div>
+      </div>
 
       {/* Agreed */}
       <section className="mb-6">
@@ -71,9 +93,7 @@ export default function Mediate() {
           {conflicts.map((c) => (
             <div key={c.item} className="bg-surface border border-border rounded-lg overflow-hidden">
               <div className="p-4">
-                <div className="text-[13px] font-bold text-primary mb-3">
-                  {c.item}
-                </div>
+                <div className="text-[13px] font-bold text-primary mb-3">{c.item}</div>
                 <div className="grid grid-cols-2 gap-2 mb-3">
                   {c.sides.map((s) => (
                     <div

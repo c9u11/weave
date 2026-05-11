@@ -16,6 +16,7 @@ import TeamHome from './pages/prototype/TeamHome';
 import IdeaNew from './pages/prototype/IdeaNew';
 import IdeasBoard from './pages/prototype/IdeasBoard';
 import IdeaDetail from './pages/prototype/IdeaDetail';
+import Vote from './pages/prototype/Vote';
 import Mediate from './pages/prototype/Mediate';
 import FinalBrief from './pages/prototype/FinalBrief';
 import Notifications from './pages/prototype/Notifications';
@@ -41,6 +42,7 @@ function App() {
         <Route path="/prototype/idea/new" element={<IdeaNew />} />
         <Route path="/prototype/ideas" element={<IdeasBoard />} />
         <Route path="/prototype/idea/:id" element={<IdeaDetail />} />
+        <Route path="/prototype/vote" element={<Vote />} />
         <Route path="/prototype/mediate" element={<Mediate />} />
         <Route path="/prototype/brief" element={<FinalBrief />} />
         <Route path="/prototype/notifications" element={<Notifications />} />
