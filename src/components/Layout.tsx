@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react';
 
 interface LayoutProps {
   title?: string;
-  children: React.ReactNode;
+  children: import('react').ReactNode;
 }
 
 export default function Layout({ title, children }: LayoutProps) {

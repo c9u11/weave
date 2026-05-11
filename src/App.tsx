@@ -4,7 +4,21 @@ import Brief from './pages/Brief';
 import Plan from './pages/Plan';
 import Design from './pages/Design';
 import Flow from './pages/Flow';
-import Prototype from './pages/Prototype';
+
+// Prototype screens
+import Launcher from './pages/prototype/Launcher';
+import Landing from './pages/prototype/Landing';
+import Onboarding from './pages/prototype/Onboarding';
+import PlanSelect from './pages/prototype/PlanSelect';
+import Invite from './pages/prototype/Invite';
+import Join from './pages/prototype/Join';
+import TeamHome from './pages/prototype/TeamHome';
+import IdeaNew from './pages/prototype/IdeaNew';
+import IdeasBoard from './pages/prototype/IdeasBoard';
+import IdeaDetail from './pages/prototype/IdeaDetail';
+import Mediate from './pages/prototype/Mediate';
+import FinalBrief from './pages/prototype/FinalBrief';
+import Notifications from './pages/prototype/Notifications';
 
 function App() {
   return (
@@ -15,7 +29,21 @@ function App() {
         <Route path="/plan" element={<Plan />} />
         <Route path="/design" element={<Design />} />
         <Route path="/flow" element={<Flow />} />
-        <Route path="/prototype" element={<Prototype />} />
+
+        {/* Prototype */}
+        <Route path="/prototype" element={<Launcher />} />
+        <Route path="/prototype/landing" element={<Landing />} />
+        <Route path="/prototype/onboarding" element={<Onboarding />} />
+        <Route path="/prototype/plan" element={<PlanSelect />} />
+        <Route path="/prototype/invite" element={<Invite />} />
+        <Route path="/prototype/join" element={<Join />} />
+        <Route path="/prototype/team" element={<TeamHome />} />
+        <Route path="/prototype/idea/new" element={<IdeaNew />} />
+        <Route path="/prototype/ideas" element={<IdeasBoard />} />
+        <Route path="/prototype/idea/:id" element={<IdeaDetail />} />
+        <Route path="/prototype/mediate" element={<Mediate />} />
+        <Route path="/prototype/brief" element={<FinalBrief />} />
+        <Route path="/prototype/notifications" element={<Notifications />} />
       </Routes>
     </BrowserRouter>
   );
