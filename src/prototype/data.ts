@@ -95,6 +95,64 @@ export const currentUser = {
   color: '#1E1B4B',
 };
 
+// ============= 일정 ============= //
+
+export interface ScheduledStage {
+  key: 'collect' | 'feedback' | 'vote' | 'mediate' | 'brief';
+  label: string;
+  desc: string;
+  /** 0~1 비율 (프로젝트 시작점 0 ~ 마감일 1) */
+  ratio: number;
+  /** 사용자가 정한 마감일 (ISO yyyy-mm-dd) */
+  deadline?: string;
+}
+
+export const scheduleTemplate: ScheduledStage[] = [
+  { key: 'collect', label: '아이디어 제출', desc: '팀원이 각자 자유롭게 작성', ratio: 0.4 },
+  { key: 'feedback', label: '피드백', desc: 'AI 분석 + 팀원 댓글·평가', ratio: 0.62 },
+  { key: 'vote', label: '투표', desc: '4가지 기준으로 최종 아이디어 선정', ratio: 0.78 },
+  { key: 'mediate', label: 'AI 충돌 중재', desc: '합의/충돌 정리', ratio: 0.9 },
+  { key: 'brief', label: '최종 기획안', desc: '1페이지 + Export', ratio: 1.0 },
+];
+
+/**
+ * 프로젝트 마감일 → 단계별 추천 일정
+ * 오늘부터 마감일까지의 기간을 비율로 분배
+ */
+export function recommendSchedule(projectDeadline: string): ScheduledStage[] {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const end = new Date(projectDeadline);
+  end.setHours(0, 0, 0, 0);
+  const totalMs = end.getTime() - today.getTime();
+  const totalDays = Math.max(1, Math.ceil(totalMs / 86400000));
+
+  return scheduleTemplate.map((s) => {
+    const days = Math.round(totalDays * s.ratio);
+    const date = new Date(today);
+    date.setDate(date.getDate() + days);
+    return {
+      ...s,
+      deadline: date.toISOString().slice(0, 10),
+    };
+  });
+}
+
+/**
+ * D-N 형태로 변환 (오늘 = D-Day)
+ */
+export function toDDay(isoDate: string): string {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const target = new Date(isoDate);
+  target.setHours(0, 0, 0, 0);
+  const days = Math.round((target.getTime() - today.getTime()) / 86400000);
+  if (days === 0) return 'D-Day';
+  if (days > 0) return `D-${days}`;
+  return `D+${-days}`;
+}
+
+
 export const members: TeamMember[] = [
   { id: 'm1', name: '김채원', initial: '채', color: '#FB923C', isHost: true, status: 'active', ideasCount: 2 },
   { id: 'm2', name: '박준혁', initial: '준', color: '#A78BFA', isHost: false, status: 'writing', ideasCount: 1 },
