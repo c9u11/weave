@@ -9,26 +9,25 @@ import {
   team,
   members,
   notifications,
-  scheduleTemplate,
   recommendSchedule,
   toDDay,
+  stageToScheduleKey,
   type ScheduledStage,
+  type ScheduleKey,
 } from '../../prototype/data';
 
-const pathByKey: Record<ScheduledStage['key'], string> = {
+const pathByKey: Record<ScheduleKey, string> = {
   collect: '/prototype/idea/new',
   feedback: '/prototype/ideas',
   vote: '/prototype/vote',
-  mediate: '/prototype/mediate',
-  brief: '/prototype/brief',
+  wrap: '/prototype/mediate',
 };
 
-const ctaByKey: Record<ScheduledStage['key'], string> = {
+const ctaByKey: Record<ScheduleKey, string> = {
   collect: '아이디어 작성하기',
   feedback: '피드백 작성하기',
   vote: '투표하기',
-  mediate: '충돌 중재 보기',
-  brief: '기획안 보기',
+  wrap: '충돌 중재 + 기획안',
 };
 
 export default function TeamHome() {
@@ -37,7 +36,7 @@ export default function TeamHome() {
 
   // 일정 — 온보딩에서 저장한 값이 있으면 사용, 없으면 기본 7일 추천
   const schedule = useMemo<ScheduledStage[]>(() => {
-    if (typeof window === 'undefined') return scheduleTemplate;
+    if (typeof window === 'undefined') return [];
     try {
       const saved = sessionStorage.getItem('weave:schedule');
       if (saved) return JSON.parse(saved);
@@ -47,8 +46,8 @@ export default function TeamHome() {
     return recommendSchedule(fallbackDeadline.toISOString().slice(0, 10));
   }, []);
 
-  // 현재 단계 인덱스
-  const currentIdx = schedule.findIndex((s) => s.key === team.stage);
+  const currentScheduleKey = stageToScheduleKey[team.stage];
+  const currentIdx = schedule.findIndex((s) => s.key === currentScheduleKey);
   const currentStage = schedule[currentIdx] ?? schedule[0];
   const projectDeadline = schedule[schedule.length - 1]?.deadline;
 
@@ -155,9 +154,7 @@ export default function TeamHome() {
             <div className="flex-1">
               <div className="text-[13px] font-bold text-primary">
                 {m.name}{' '}
-                {m.isHost && (
-                  <span className="text-[10px] text-accent ml-1">호스트</span>
-                )}
+                {m.isHost && <span className="text-[10px] text-accent ml-1">호스트</span>}
               </div>
               <div className="text-[11px] text-muted">
                 {m.status === 'active' && `${m.ideasCount}개 작성`}

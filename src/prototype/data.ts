@@ -97,46 +97,73 @@ export const currentUser = {
 
 // ============= 일정 ============= //
 
+export type ScheduleKey = 'collect' | 'feedback' | 'vote' | 'wrap';
+
 export interface ScheduledStage {
-  key: 'collect' | 'feedback' | 'vote' | 'mediate' | 'brief';
+  key: ScheduleKey;
   label: string;
   desc: string;
-  /** 0~1 비율 (프로젝트 시작점 0 ~ 마감일 1) */
-  ratio: number;
+  /** false면 자동 계산 (사용자 수정 불가) */
+  editable: boolean;
   /** 사용자가 정한 마감일 (ISO yyyy-mm-dd) */
   deadline?: string;
 }
 
 export const scheduleTemplate: ScheduledStage[] = [
-  { key: 'collect', label: '아이디어 제출', desc: '팀원이 각자 자유롭게 작성', ratio: 0.4 },
-  { key: 'feedback', label: '피드백', desc: 'AI 분석 + 팀원 댓글·평가', ratio: 0.62 },
-  { key: 'vote', label: '투표', desc: '4가지 기준으로 최종 아이디어 선정', ratio: 0.78 },
-  { key: 'mediate', label: 'AI 충돌 중재', desc: '합의/충돌 정리', ratio: 0.9 },
-  { key: 'brief', label: '최종 기획안', desc: '1페이지 + Export', ratio: 1.0 },
+  { key: 'collect', label: '아이디어 제출', desc: '팀원이 각자 자유롭게 작성', editable: true },
+  { key: 'feedback', label: '피드백', desc: 'AI 분석 + 팀원 댓글·평가', editable: true },
+  { key: 'vote', label: '투표', desc: '4가지 기준으로 최종 아이디어 선정', editable: true },
+  { key: 'wrap', label: '마무리 (충돌 중재 + 기획안)', desc: 'AI가 정리 → Export', editable: false },
 ];
 
 /**
  * 프로젝트 마감일 → 단계별 추천 일정
- * 오늘부터 마감일까지의 기간을 비율로 분배
+ * - wrap (충돌 중재 + 기획안): 프로젝트 마감일 당일 (1일)
+ * - vote: 1일 (wrap 직전)
+ * - feedback: 남은 일정의 40%
+ * - collect: 나머지
  */
 export function recommendSchedule(projectDeadline: string): ScheduledStage[] {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const end = new Date(projectDeadline);
   end.setHours(0, 0, 0, 0);
-  const totalMs = end.getTime() - today.getTime();
-  const totalDays = Math.max(1, Math.ceil(totalMs / 86400000));
+  const totalDays = Math.max(2, Math.ceil((end.getTime() - today.getTime()) / 86400000));
 
-  return scheduleTemplate.map((s) => {
-    const days = Math.round(totalDays * s.ratio);
-    const date = new Date(today);
-    date.setDate(date.getDate() + days);
-    return {
-      ...s,
-      deadline: date.toISOString().slice(0, 10),
-    };
-  });
+  const wrapDays = 1;
+  const voteDays = 1;
+  const remaining = Math.max(2, totalDays - wrapDays - voteDays);
+  const feedbackDays = Math.max(1, Math.round(remaining * 0.4));
+  const collectDays = Math.max(1, remaining - feedbackDays);
+
+  const fmt = (d: Date) => d.toISOString().slice(0, 10);
+  const add = (base: Date, days: number) => {
+    const d = new Date(base);
+    d.setDate(d.getDate() + days);
+    return d;
+  };
+
+  const collectDeadline = add(today, collectDays);
+  const feedbackDeadline = add(collectDeadline, feedbackDays);
+  const voteDeadline = add(feedbackDeadline, voteDays);
+
+  return [
+    { ...scheduleTemplate[0], deadline: fmt(collectDeadline) },
+    { ...scheduleTemplate[1], deadline: fmt(feedbackDeadline) },
+    { ...scheduleTemplate[2], deadline: fmt(voteDeadline) },
+    { ...scheduleTemplate[3], deadline: projectDeadline },
+  ];
 }
+
+/** team.stage (6개) → 사용자 화면 키 (4개) */
+export const stageToScheduleKey: Record<Stage, ScheduleKey> = {
+  collect: 'collect',
+  review: 'collect',
+  feedback: 'feedback',
+  vote: 'vote',
+  mediate: 'wrap',
+  brief: 'wrap',
+};
 
 /**
  * D-N 형태로 변환 (오늘 = D-Day)

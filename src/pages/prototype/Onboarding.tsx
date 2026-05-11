@@ -170,9 +170,15 @@ export default function Onboarding() {
                 {schedule.map((s, idx) => (
                   <div
                     key={s.key}
-                    className="flex items-center gap-3 p-3 bg-surface border border-border rounded-md"
+                    className={`flex items-center gap-3 p-3 rounded-md border ${
+                      s.editable ? 'bg-surface border-border' : 'bg-surface-alt border-border'
+                    }`}
                   >
-                    <div className="w-7 h-7 rounded-full bg-accent-soft/40 text-accent text-[12px] font-bold flex items-center justify-center flex-shrink-0">
+                    <div
+                      className={`w-7 h-7 rounded-full text-[12px] font-bold flex items-center justify-center flex-shrink-0 ${
+                        s.editable ? 'bg-accent-soft/40 text-accent' : 'bg-border text-muted'
+                      }`}
+                    >
                       {idx + 1}
                     </div>
                     <div className="flex-1 min-w-0">
@@ -180,13 +186,19 @@ export default function Onboarding() {
                       <div className="text-[11px] text-muted">{s.desc}</div>
                     </div>
                     <div className="flex flex-col items-end gap-0.5 flex-shrink-0">
-                      <input
-                        type="date"
-                        value={s.deadline}
-                        onChange={(e) => updateStageDate(s.key, e.target.value)}
-                        className="text-[12px] text-primary bg-transparent border border-border rounded-md px-2 py-1 focus:outline-none focus:border-primary"
-                      />
-                      <Badge variant="soft" className="!text-[10px]">
+                      {s.editable ? (
+                        <input
+                          type="date"
+                          value={s.deadline}
+                          onChange={(e) => updateStageDate(s.key, e.target.value)}
+                          className="text-[12px] text-primary bg-transparent border border-border rounded-md px-2 py-1 focus:outline-none focus:border-primary"
+                        />
+                      ) : (
+                        <div className="text-[11px] text-muted px-2 py-1">
+                          프로젝트 마감일 (1일)
+                        </div>
+                      )}
+                      <Badge variant={s.editable ? 'soft' : 'default'} className="!text-[10px]">
                         {toDDay(s.deadline!)}
                       </Badge>
                     </div>
