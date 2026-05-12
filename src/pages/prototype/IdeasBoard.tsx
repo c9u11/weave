@@ -13,6 +13,7 @@ interface DraftIdea {
   title: string;
   emoji: string;
   gradient: string;
+  image?: string;
   rawText: string;
   rating: number;
   commentsCount: number;
@@ -64,10 +65,19 @@ export default function IdeasBoard() {
               className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-primary/30 hover:shadow-md transition-all flex flex-col"
             >
               <div
-                className="relative h-32 flex items-center justify-center text-5xl"
+                className="relative h-32 flex items-center justify-center text-5xl overflow-hidden"
                 style={{ background: idea.gradient }}
               >
-                {idea.emoji}
+                {idea.image ? (
+                  <img
+                    src={idea.image}
+                    alt={idea.title}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  idea.emoji
+                )}
                 <div className="absolute top-2 right-2 flex items-center gap-1 bg-primary/70 text-paper text-[10px] font-bold px-2 py-1 rounded-full">
                   <Sparkles size={10} />
                   AI 생성

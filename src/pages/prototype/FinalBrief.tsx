@@ -14,23 +14,27 @@ import { PrototypeLayout } from '../../prototype/PrototypeLayout';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 
-const md = `# 친구 메뉴 투표 앱
+const md = `# AI 팀 프로젝트 매니저
 
 ## 문제
-친구들과 배달 메뉴 합의 과정이 번거롭다. 카톡으로 의견 모으면 흩어지고,
-누가 어디 좋아하는지 추적 어려움.
+팀 프로젝트의 병목은 초기 기획 단계다. 일정이 안 맞아 회의가 어렵고,
+아이디어는 카톡·메모장·구글 문서에 흩어진다. 기획안을 정해도 산출물·역할·일정이
+불분명해 팀장 한두 명이 모든 부담을 떠안는다.
 
 ## 핵심 기능
-실시간 그룹 메뉴 투표 + AI 추천 (입맛 학습).
+비동기 아이디어 작성·댓글·투표 → AI 아이디어 분석(공감성·실현성·차별성·리스크)
+→ 기준별 투표로 기획안 선정 → 산출물·역할·일정 구조 자동 생성 → 진행 알림
+→ Claude MCP 연동 PPT 초안 생성.
 
 ## 타깃
-20대 친구 그룹 배달 주문자 (대학생·신입사회인).
+대학생 조별과제 팀, 공모전·아이디어톤·해커톤 팀, 창업동아리, 신입사원 교육 팀.
 
 ## 차별점
-입맛 학습 알고리즘 + 카톡 외 매끄러운 합의 UX.
+카톡(대화 속 유실)·Notion(직접 구조화)·Trello(아이디어 평가·구조화 불가)와 달리,
+흩어진 아이디어를 "제출 가능한 결과물"로 바꿔주는 AI 팀 프로젝트 매니저.
 
 ## MVP
-그룹 내 메뉴 5개 중 투표 1개 기능 (1차).
+아이디어 수렴 → AI 분석 → 투표 → 산출물 구조화까지 (PPT 자동 생성은 2차).
 `;
 
 export default function FinalBrief() {
@@ -55,11 +59,12 @@ export default function FinalBrief() {
 
       {/* Preview */}
       <div className="bg-surface border border-border rounded-lg overflow-hidden mb-5">
-        <div
-          className="h-32 flex items-center justify-center text-6xl"
-          style={{ background: 'linear-gradient(135deg, #FCD34D55, #FB923C55)' }}
-        >
-          🍔
+        <div className="h-44 overflow-hidden bg-surface-alt">
+          <img
+            src="/ideas/i8.jpg"
+            alt="AI 팀 프로젝트 매니저"
+            className="w-full h-full object-cover object-top"
+          />
         </div>
         <div className="p-4 max-h-72 overflow-y-auto">
           <pre className="text-[12px] font-mono text-primary whitespace-pre-wrap leading-relaxed">

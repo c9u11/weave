@@ -15,9 +15,9 @@ export default function Join() {
           className="w-14 h-14 mx-auto mb-5 [&_path]:fill-primary"
         />
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Avatar initial="채" color="#FB923C" size="sm" />
+          <Avatar initial="병" color="#F87171" size="sm" />
           <span className="text-[14px] text-muted">
-            <strong className="text-primary">김채원</strong>님이 초대했어요
+            <strong className="text-primary">병찬</strong>님이 초대했어요
           </span>
         </div>
       </div>

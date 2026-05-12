@@ -62,7 +62,7 @@ export default function IdeaNew() {
         value={text}
         onChange={(e) => setText(e.target.value)}
         disabled={submitting}
-        placeholder='"배달앱이 너무 많아서 뭘 시킬지 모르겠음. 친구들이랑 같이 고르면 좋겠는데 카톡으로 하기 귀찮음..."'
+        placeholder='"팀플 초반에 아이디어가 카톡·메모장·구글 문서에 다 흩어져서 정리가 안 됨. 한 곳에 모으고 AI가 평가·구조화까지 해주면 좋겠음. 두서없어도 괜찮으니 일단 적기..."'
         className="input"
       />
 

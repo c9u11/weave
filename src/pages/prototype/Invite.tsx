@@ -52,9 +52,9 @@ export default function Invite() {
         </h2>
         <div className="space-y-2">
           <div className="flex items-center gap-3 p-3 bg-surface border border-border rounded-md">
-            <Avatar initial="채" color="#FB923C" size="sm" />
+            <Avatar initial="병" color="#F87171" size="sm" />
             <div className="flex-1">
-              <div className="text-[13px] font-bold text-primary">김채원 (나)</div>
+              <div className="text-[13px] font-bold text-primary">병찬 (나)</div>
               <div className="text-[11px] text-muted">호스트</div>
             </div>
           </div>

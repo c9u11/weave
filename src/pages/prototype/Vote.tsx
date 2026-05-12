@@ -115,10 +115,14 @@ export default function Vote() {
             >
               <div className="flex items-center gap-3 p-4">
                 <div
-                  className="w-16 h-16 rounded-md flex items-center justify-center text-3xl flex-shrink-0"
+                  className="w-16 h-16 rounded-md flex items-center justify-center text-3xl flex-shrink-0 overflow-hidden"
                   style={{ background: idea.gradient }}
                 >
-                  {idea.emoji}
+                  {idea.image ? (
+                    <img src={idea.image} alt={idea.title} loading="lazy" className="w-full h-full object-cover object-top" />
+                  ) : (
+                    idea.emoji
+                  )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="text-[10px] font-bold text-accent">👤 {idea.authorName}</div>

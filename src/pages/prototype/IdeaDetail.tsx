@@ -86,10 +86,18 @@ export default function IdeaDetail() {
         <div className="lg:col-span-2 space-y-5">
           {/* Hero image */}
           <div
-            className="relative h-56 sm:h-64 rounded-lg flex items-center justify-center text-7xl overflow-hidden"
+            className="relative h-56 sm:h-72 rounded-lg flex items-center justify-center text-7xl overflow-hidden"
             style={{ background: idea.gradient }}
           >
-            {idea.emoji}
+            {idea.image ? (
+              <img
+                src={idea.image}
+                alt={idea.title}
+                className="absolute inset-0 w-full h-full object-cover object-top"
+              />
+            ) : (
+              idea.emoji
+            )}
             <div className="absolute bottom-3 right-3 flex gap-2">
               <button className="flex items-center gap-1 bg-primary/85 text-paper text-[11px] font-bold px-3 py-1.5 rounded-full hover:bg-primary transition-colors">
                 <Sparkles size={12} /> AI 생성

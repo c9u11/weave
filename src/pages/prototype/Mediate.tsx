@@ -6,27 +6,28 @@ import { Badge } from '../../components/ui/Badge';
 import { ideas } from '../../prototype/data';
 
 const agreed = [
-  { item: '문제 정의', detail: '친구들과 메뉴 합의가 번거롭다', votes: 3 },
-  { item: '타깃', detail: '20대 친구 그룹 배달 주문자', votes: 3 },
+  { item: '문제 정의', detail: '팀 프로젝트의 병목은 초기 기획 — 아이디어가 흩어지고 팀장 한두 명이 부담을 떠안는다', votes: 5 },
+  { item: '타깃', detail: '대학생 조별과제 팀, 공모전·아이디어톤·해커톤 참가 팀', votes: 5 },
 ];
 
 const conflicts = [
   {
     item: '실현 가능성',
     sides: [
-      { who: '준혁', stance: '어렵습니다 ✗', color: '#A78BFA' },
-      { who: '채원', stance: 'MVP 가능 ✓', color: '#FB923C' },
+      { who: '영준', stance: 'PPT 자동 생성까지는 무리 ✗', color: '#A78BFA' },
+      { who: '병찬', stance: '핵심 4단계는 가능 ✓', color: '#F87171' },
     ],
     suggestion:
-      '핵심 기능 1개로 좁히면 둘 다 가능. 검증 질문: "MVP의 최소 동작은?" → 그룹 내 메뉴 5개 중 투표 1개 기능만 우선.',
+      '데모 범위를 "아이디어 수렴 → AI 분석 → 투표 → 산출물 구조화"로 좁히면 둘 다 가능. PPT 자동 생성은 2차로 미룬다.',
   },
   {
     item: '차별성',
     sides: [
-      { who: '서진', stance: '약함 ✗', color: '#34D399' },
-      { who: '채원', stance: '충분 ✓', color: '#FB923C' },
+      { who: '현준', stance: 'Notion과 뭐가 다른지 약함 ✗', color: '#FB923C' },
+      { who: '병찬', stance: '"평가→구조화"가 차별점 ✓', color: '#F87171' },
     ],
-    suggestion: '경쟁 서비스 3개 비교 후 결정. 카톡 투표 / 토스 모임투표 / 자체 추천 알고리즘.',
+    suggestion:
+      '경쟁 서비스 비교로 못 박기: Notion(직접 구조화)·Trello(아이디어 평가 불가)·ChatGPT(팀 흐름 미관리) vs "아이디어를 제출 가능한 결과물로 바꾼다".',
   },
 ];
 
@@ -48,10 +49,14 @@ export default function Mediate() {
       {/* Winner card */}
       <div className="bg-surface border-2 border-accent rounded-lg overflow-hidden mb-6 flex items-center gap-3 p-3">
         <div
-          className="w-16 h-16 rounded-md flex items-center justify-center text-3xl flex-shrink-0"
+          className="w-16 h-16 rounded-md flex items-center justify-center text-3xl flex-shrink-0 overflow-hidden"
           style={{ background: winner.gradient }}
         >
-          {winner.emoji}
+          {winner.image ? (
+            <img src={winner.image} alt={winner.title} className="w-full h-full object-cover object-top" />
+          ) : (
+            winner.emoji
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
@@ -77,7 +82,7 @@ export default function Mediate() {
               <div className="text-[13px] font-bold text-primary">{a.item}</div>
               <div className="text-[13px] text-muted mt-1 leading-relaxed">{a.detail}</div>
               <div className="text-[11px] text-success mt-1.5 font-semibold">
-                3명 모두 👍
+                팀원 전원 👍
               </div>
             </div>
           ))}
