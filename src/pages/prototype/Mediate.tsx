@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import { CheckCircle2, AlertTriangle, Bot, ArrowRight, MessageSquare, Trophy } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
+import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ideas } from '../../prototype/data';
@@ -38,6 +39,7 @@ export default function Mediate() {
 
   return (
     <PrototypeLayout>
+      <StageBackLink />
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
         5단계 — AI 충돌 중재
       </p>

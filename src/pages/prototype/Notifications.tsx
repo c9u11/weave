@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { MessageSquare, Bot, Star, Users, Clock, CheckCheck } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
+import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 import { notifications } from '../../prototype/data';
 import { useState } from 'react';
@@ -28,6 +29,7 @@ export default function Notifications() {
 
   return (
     <PrototypeLayout>
+      <StageBackLink />
       <h1 className="text-2xl font-bold tracking-tighter text-primary mb-1">알림</h1>
       <p className="text-[13px] text-muted mb-5">
         {unreadCount > 0 ? `읽지 않은 알림 ${unreadCount}개` : '모두 읽었어요'}

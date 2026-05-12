@@ -2,6 +2,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import { Plus, Star, MessageSquare, Sparkles, ArrowRight } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
+import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 import { ideas as baseIdeas, notifications } from '../../prototype/data';
 
@@ -36,6 +37,7 @@ export default function IdeasBoard() {
 
   return (
     <PrototypeLayout showBell bellCount={unread} phoneWidth={false}>
+      <StageBackLink />
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
         2단계 — 모아보기
       </p>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Mic, Image as ImageIcon, Sparkles, Loader2 } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
+import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 
 const gradients = [
@@ -47,6 +48,7 @@ export default function IdeaNew() {
 
   return (
     <PrototypeLayout>
+      <StageBackLink />
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
         1단계 — 내 아이디어
       </p>

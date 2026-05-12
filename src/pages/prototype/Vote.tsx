@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check, ArrowRight, Trophy, Info } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
+import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 import { ideas, voteCriteria, initialVotes, members } from '../../prototype/data';
@@ -46,6 +47,7 @@ export default function Vote() {
 
   return (
     <PrototypeLayout showBell bellCount={3} phoneWidth={false}>
+      <StageBackLink />
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
         4단계 — 투표
       </p>

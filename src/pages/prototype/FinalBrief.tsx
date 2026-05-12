@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
+import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 import { Badge } from '../../components/ui/Badge';
 
@@ -49,6 +50,7 @@ export default function FinalBrief() {
 
   return (
     <PrototypeLayout>
+      <StageBackLink />
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
         5단계 — 최종 기획안
       </p>
