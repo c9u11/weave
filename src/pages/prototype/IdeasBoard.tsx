@@ -1,10 +1,17 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
-import { Plus, Star, MessageSquare, Sparkles, ArrowRight } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Plus, Star, MessageSquare, Sparkles, ArrowRight, ArrowUpDown, Clock } from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
 import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 import { ideas as baseIdeas, notifications } from '../../prototype/data';
+
+type SortKey = 'rating' | 'comments' | 'recent';
+const sortOptions: { key: SortKey; label: string; icon: typeof Star }[] = [
+  { key: 'rating', label: '별점순', icon: Star },
+  { key: 'comments', label: '댓글 많은', icon: MessageSquare },
+  { key: 'recent', label: '최신순', icon: Clock },
+];
 
 interface DraftIdea {
   id: string;
@@ -23,6 +30,7 @@ interface DraftIdea {
 export default function IdeasBoard() {
   const navigate = useNavigate();
   const unread = notifications.filter((n) => n.unread).length;
+  const [sort, setSort] = useState<SortKey>('rating');
 
   const newIdeas = useMemo<DraftIdea[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -33,7 +41,24 @@ export default function IdeasBoard() {
     }
   }, []);
 
-  const allIdeas = [...baseIdeas, ...newIdeas];
+  const allIdeas = useMemo(() => {
+    const merged = [...baseIdeas, ...newIdeas];
+    const sorted = [...merged];
+    if (sort === 'rating') {
+      sorted.sort((a, b) => b.rating - a.rating);
+    } else if (sort === 'comments') {
+      sorted.sort((a, b) => b.commentsCount - a.commentsCount);
+    } else if (sort === 'recent') {
+      // 새로 작성한 게 가장 위, 그 다음 기본 목록은 역순(i8 → i1) 으로 "최근"
+      sorted.sort((a, b) => {
+        const aNew = a.id.startsWith('new-') ? 1 : 0;
+        const bNew = b.id.startsWith('new-') ? 1 : 0;
+        if (aNew !== bNew) return bNew - aNew;
+        return b.id.localeCompare(a.id);
+      });
+    }
+    return sorted;
+  }, [newIdeas, sort]);
 
   return (
     <PrototypeLayout showBell bellCount={unread} phoneWidth={false}>
@@ -41,8 +66,8 @@ export default function IdeasBoard() {
       <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
         2단계 — 모아보기
       </p>
-      <div className="flex items-end justify-between mb-5">
-        <h1 className="text-2xl font-bold tracking-tighter text-primary">
+      <div className="flex items-end justify-between mb-4">
+        <h1 className="text-2xl font-bold tracking-tighter text-primary-dark">
           팀의 아이디어 ({allIdeas.length})
         </h1>
         <Button
@@ -53,6 +78,30 @@ export default function IdeasBoard() {
         >
           추가
         </Button>
+      </div>
+
+      {/* ====== 정렬 ====== */}
+      <div className="flex items-center gap-1.5 mb-4 overflow-x-auto pb-1">
+        <span className="text-[11px] text-muted flex items-center gap-1 flex-shrink-0 mr-1">
+          <ArrowUpDown size={11} /> 정렬
+        </span>
+        {sortOptions.map(({ key, label, icon: Icon }) => {
+          const active = sort === key;
+          return (
+            <button
+              key={key}
+              onClick={() => setSort(key)}
+              className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-full border transition-colors flex-shrink-0 ${
+                active
+                  ? 'bg-primary text-paper border-primary'
+                  : 'bg-surface text-muted border-border hover:border-primary/40'
+              }`}
+            >
+              <Icon size={11} />
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">

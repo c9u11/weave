@@ -16,7 +16,7 @@ const iconByType = {
 
 const colorByType = {
   comment: '#A78BFA',
-  ai: '#B45309',
+  ai: '#566CCC', // Wave primary — 'AI 페르소나 비평' 등 우리 제품 시그니처 색
   rating: '#FB923C',
   member: '#34D399',
   deadline: '#F87171',

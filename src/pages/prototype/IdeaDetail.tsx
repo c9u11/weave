@@ -1,12 +1,15 @@
 import { useState, useMemo } from 'react';
 import type { KeyboardEvent } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { Sparkles, RotateCw, ArrowLeft, MessageSquare, Bot, Star, ThumbsUp, ArrowRight, AtSign, Send } from 'lucide-react';
+import {
+  Sparkles, RotateCw, ArrowLeft, MessageSquare, Bot, Star, ThumbsUp,
+  ArrowRight, AtSign, Send, Clock, CornerDownRight, Pencil,
+} from 'lucide-react';
 import { PrototypeLayout } from '../../prototype/PrototypeLayout';
 import { Button } from '../../components/ui/Button';
 import { Avatar } from '../../components/ui/Avatar';
 import { Badge } from '../../components/ui/Badge';
-import { ideas, currentUser, type Comment } from '../../prototype/data';
+import { ideas, currentUser, mockUpdatedAt, type Comment, type Reply } from '../../prototype/data';
 
 const organizeKeys = [
   { key: 'problem' as const, label: '문제 정의' },
@@ -24,6 +27,9 @@ export default function IdeaDetail() {
   const [activeTarget, setActiveTarget] = useState<string | null>(null);
   const [comments, setComments] = useState<Comment[]>(idea?.comments ?? []);
   const [draft, setDraft] = useState('');
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyDraft, setReplyDraft] = useState('');
+  const isMyIdea = idea?.authorId === currentUser.id;
 
   const commentsByTarget = useMemo(
     () =>
@@ -69,16 +75,46 @@ export default function IdeaDetail() {
     }
   };
 
+  const submitReply = (commentId: string) => {
+    const text = replyDraft.trim();
+    if (!text) return;
+    const newReply: Reply = {
+      id: `r-${Date.now()}`,
+      authorId: currentUser.id,
+      authorName: currentUser.name,
+      authorColor: currentUser.color,
+      text,
+      time: '방금',
+    };
+    setComments((prev) =>
+      prev.map((c) =>
+        c.id === commentId ? { ...c, replies: [...(c.replies ?? []), newReply] } : c
+      )
+    );
+    setReplyDraft('');
+    setReplyingTo(null);
+  };
+
   return (
     <PrototypeLayout wide showBell bellCount={3}>
       {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-[12px] text-muted mb-4">
+      <div className="flex items-center gap-2 text-[12px] text-muted mb-4 flex-wrap">
         <Link to="/prototype/ideas" className="flex items-center gap-1 hover:text-primary">
           <ArrowLeft size={14} /> 모아보기
         </Link>
         <span>·</span>
         <Avatar initial={idea.authorName[0]} color={idea.authorColor} size="sm" className="!w-5 !h-5 !text-[10px]" />
-        <span className="text-primary font-semibold">{idea.authorName}</span>
+        <span className="text-primary-dark font-semibold">{idea.authorName}</span>
+        <span>·</span>
+        <span className="flex items-center gap-1">
+          <Clock size={11} /> {mockUpdatedAt(idea.id)} 업데이트
+        </span>
+        <Link
+          to={`/prototype/idea/${idea.id}/edit`}
+          className="ml-auto flex items-center gap-1 text-primary font-semibold hover:underline"
+        >
+          <Pencil size={12} /> {isMyIdea ? '내 아이디어 수정' : '수정 보기'}
+        </Link>
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
@@ -231,7 +267,7 @@ export default function IdeaDetail() {
                         key={c.id}
                         className={`mb-3 last:mb-0 bg-paper border rounded-md p-3 transition-all ${
                           activeTarget && c.target === activeTarget
-                            ? 'border-accent shadow-sm'
+                            ? 'border-primary shadow-sm'
                             : 'border-border'
                         }`}
                       >
@@ -239,7 +275,7 @@ export default function IdeaDetail() {
                           <Avatar initial={c.authorName[0]} color={c.authorColor} size="sm" />
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[12px] font-bold text-primary">
+                              <span className="text-[12px] font-bold text-primary-dark">
                                 {c.authorName}
                               </span>
                               {c.target && (
@@ -249,14 +285,81 @@ export default function IdeaDetail() {
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-[12px] text-muted leading-relaxed mt-1.5">
+                            <p className="text-[12px] text-primary-dark/85 leading-relaxed mt-1.5">
                               {c.text}
                             </p>
-                            <p className="text-[10px] text-muted/60 mt-1.5">
-                              {c.time}
-                            </p>
+                            <div className="flex items-center gap-3 mt-1.5">
+                              <span className="text-[10px] text-muted/70">{c.time}</span>
+                              <button
+                                onClick={() => {
+                                  setReplyingTo(replyingTo === c.id ? null : c.id);
+                                  setReplyDraft('');
+                                }}
+                                className="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5"
+                              >
+                                <CornerDownRight size={10} />
+                                답글
+                              </button>
+                            </div>
                           </div>
                         </div>
+
+                        {/* 답글 목록 */}
+                        {c.replies && c.replies.length > 0 && (
+                          <div className="mt-3 pl-7 space-y-2 border-l-2 border-border ml-3">
+                            {c.replies.map((r) => (
+                              <div key={r.id} className="flex items-start gap-2 pl-2">
+                                <Avatar
+                                  initial={r.authorName[0]}
+                                  color={r.authorColor}
+                                  size="sm"
+                                  className="!w-5 !h-5 !text-[10px]"
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="text-[11px] font-bold text-primary-dark">
+                                      {r.authorName}
+                                    </span>
+                                    <span className="text-[10px] text-muted/70">{r.time}</span>
+                                  </div>
+                                  <p className="text-[11.5px] text-primary-dark/80 leading-relaxed mt-0.5">
+                                    {r.text}
+                                  </p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* 답글 입력 */}
+                        {replyingTo === c.id && (
+                          <div className="mt-3 pl-7 ml-3 border-l-2 border-primary/40">
+                            <div className="flex gap-2 pl-2">
+                              <input
+                                value={replyDraft}
+                                onChange={(e) => setReplyDraft(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    submitReply(c.id);
+                                  }
+                                }}
+                                placeholder={`${c.authorName} 님에게 답글...`}
+                                autoFocus
+                                className="input !py-1.5 !text-[11.5px] flex-1"
+                              />
+                              <Button
+                                variant="primary"
+                                size="sm"
+                                onClick={() => submitReply(c.id)}
+                                disabled={!replyDraft.trim()}
+                                className="!px-2 !py-1.5"
+                              >
+                                <Send size={11} />
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     ))
                   )}
@@ -313,9 +416,9 @@ export default function IdeaDetail() {
           variant="primary"
           fullWidth
           rightIcon={<ArrowRight size={14} />}
-          onClick={() => navigate('/prototype/mediate')}
+          onClick={() => navigate('/prototype/vote')}
         >
-          AI 충돌 중재로
+          투표하러 가기
         </Button>
       </div>
     </PrototypeLayout>

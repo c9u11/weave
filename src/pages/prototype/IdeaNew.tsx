@@ -6,11 +6,11 @@ import { StageBackLink } from '../../prototype/StageBackLink';
 import { Button } from '../../components/ui/Button';
 
 const gradients = [
-  'linear-gradient(135deg, #FCD34D55, #FB923C55)',
-  'linear-gradient(135deg, #34D39955, #FCD34D55)',
-  'linear-gradient(135deg, #A78BFA55, #B4530955)',
-  'linear-gradient(135deg, #FB923C55, #A78BFA55)',
-  'linear-gradient(135deg, #F8717155, #FB923C55)',
+  'linear-gradient(135deg, #566CCC22, #8694DF44)',
+  'linear-gradient(135deg, #8694DF33, #566CCC22)',
+  'linear-gradient(135deg, #3C488322, #566CCC33)',
+  'linear-gradient(135deg, #8694DF22, #E8EBF7AA)',
+  'linear-gradient(135deg, #3C488333, #8694DF44)',
 ];
 
 const emojis = ['💡', '🚀', '🎯', '⚡', '🔥', '✨', '🌟', '💫'];
@@ -30,7 +30,7 @@ export default function IdeaNew() {
         id: `new-${Date.now()}`,
         authorId: 'me',
         authorName: '나',
-        authorColor: '#1E1B4B',
+        authorColor: '#3C4883',
         title: text.split('\n')[0].slice(0, 24) || '새 아이디어',
         emoji: emojis[Math.floor(Math.random() * emojis.length)],
         gradient: gradients[Math.floor(Math.random() * gradients.length)],

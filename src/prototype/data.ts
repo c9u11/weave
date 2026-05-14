@@ -31,6 +31,17 @@ export interface Comment {
   target?: string;
   text: string;
   time: string;
+  /** 댓글에 달리는 답글 (1단계 깊이만 허용) */
+  replies?: Reply[];
+}
+
+export interface Reply {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorColor: string;
+  text: string;
+  time: string;
 }
 
 export interface Idea {
@@ -43,6 +54,8 @@ export interface Idea {
   gradient: string;
   /** PDF 기획안에서 추출한 목업 이미지 (public/ideas/*.jpg). 없으면 emoji + gradient 사용 */
   image?: string;
+  /** 마지막 업데이트 텍스트 (mock) */
+  updatedAt?: string;
   rawText: string;
   organized: {
     problem: string;
@@ -98,7 +111,7 @@ export const currentUser = {
   id: 'me',
   name: '나',
   initial: '나',
-  color: '#1E1B4B',
+  color: '#3C4883',
 };
 
 // ============= 일정 ============= //
@@ -237,7 +250,7 @@ export const ideas: Idea[] = [
     authorColor: '#FB923C',
     title: 'AI 일정 매니저',
     emoji: '📅',
-    gradient: 'linear-gradient(135deg, #60A5FA55, #A78BFA55)',
+    gradient: 'linear-gradient(135deg, #566CCC22, #8694DF44)',
     image: '/ideas/i1.jpg',
     rawText:
       '일정이 카톡, 포스터, 메모 여기저기 흩어져 있어서 캘린더에 다시 옮겨 적는 게 너무 귀찮음. 약속 시간 정하는 것도 매번 똑같은 고민이고. AI한테 그냥 공유만 하면 일정이 자동으로 생기고, 여러 일정 비교해서 최적 시간까지 잡아주면 좋겠음. 통제하는 게 아니라 옆에서 도와주는 느낌으로. "쓰는 게 아니라 넘기면 끝."',
@@ -282,7 +295,7 @@ export const ideas: Idea[] = [
     authorColor: '#A78BFA',
     title: 'AI 숏폼 체크인',
     emoji: '🎬',
-    gradient: 'linear-gradient(135deg, #A78BFA55, #60A5FA55)',
+    gradient: 'linear-gradient(135deg, #8694DF33, #566CCC22)',
     image: '/ideas/i2.jpg',
     rawText:
       '과제하다 잠깐 쉬려고 쇼츠 켰는데 정신 차리면 한 시간 지나있음. 더 문제는 그 다음에 다시 과제로 돌아가기가 너무 힘듦. 차단 앱은 막기만 해서 짜증나고 결국 다른 데서 시간 버림. 막는 게 아니라 "왜 보고 싶은지" 물어보고, 잘 쉬게 해주고, 빨리 돌아오게 도와주는 게 핵심. 목표는 사용시간 감소가 아니라 복귀 시간 감소.',
@@ -317,7 +330,7 @@ export const ideas: Idea[] = [
     authorColor: '#34D399',
     title: '음성으로 찾는 재취업',
     emoji: '🎙️',
-    gradient: 'linear-gradient(135deg, #34D39955, #FCD34D55)',
+    gradient: 'linear-gradient(135deg, #8694DF22, #E8EBF7AA)',
     image: '/ideas/i3.jpg',
     rawText:
       '고령층이나 경력단절 여성분들이 고용24, 정부24 같은 데서 일자리 찾으려면 회원가입·본인인증·신청서·파일 업로드... 이게 다 벽임. "집 근처 주 3일 일자리 찾아줘" 하고 말로 물어보면 AI가 찾아주고, 신청까지 단계별로 같이 해주면 좋겠음. 큰 글씨, 단순한 버튼으로. 보호자(자녀·요양보호사)가 연동해서 도와줄 수도 있게.',
@@ -343,7 +356,7 @@ export const ideas: Idea[] = [
     authorColor: '#F472B6',
     title: '펫 라이프 AI 가계부',
     emoji: '🐾',
-    gradient: 'linear-gradient(135deg, #F472B655, #FCD34D55)',
+    gradient: 'linear-gradient(135deg, #566CCC22, #8694DF44)',
     rawText:
       '반려동물 키우면 사료·간식·미용·병원비... 돈이 새는데 얼마나 쓰는지 감이 안 옴. 의료비는 예측도 안 되고. 카드 내역이랑 영수증 넣으면 카테고리별로 정리해주고, 품종·나이별 질병 확률이랑 비용 증가 그래프도 보여주고, 재고 떨어지면 자동 주문까지 해주는 가계부. "펫 라이프의 새어나감을 없앤다."',
     organized: {
@@ -365,10 +378,10 @@ export const ideas: Idea[] = [
     id: 'i5',
     authorId: 'me',
     authorName: '나',
-    authorColor: '#1E1B4B',
+    authorColor: '#3C4883',
     title: '어디까지 했더라',
     emoji: '🗂️',
-    gradient: 'linear-gradient(135deg, #1E1B4B22, #A78BFA55)',
+    gradient: 'linear-gradient(135deg, #3C488322, #566CCC44)',
     image: '/ideas/i5.jpg',
     rawText:
       '하루에도 전공 수업, 동아리, 사이드 프로젝트... 모드를 계속 바꾸는데 그때마다 "어디까지 했더라" 떠올리고 앱이랑 자료 다시 세팅하는 데 시간 다 씀. Mac 노치에 모드별 환경 두고, 모드 켜면 뒤에서 조용히 클립보드랑 방문 URL 모아두고, 모드 끄면 AI가 요약해주고, 다시 들어오면 그 요약이랑 자주 쓰던 앱 바로 띄워주면 좋겠음. 노치에 던지기만 하면 끝.',
@@ -404,7 +417,7 @@ export const ideas: Idea[] = [
     authorColor: '#F87171',
     title: 'AI 발표 연습 코치',
     emoji: '🎤',
-    gradient: 'linear-gradient(135deg, #FCD34D55, #F8717155)',
+    gradient: 'linear-gradient(135deg, #3C488322, #566CCC33)',
     rawText:
       'PPT는 만들었는데 막상 뭐라고 말해야 할지 모르겠고, 발표문 써도 말하면 어색함. 외우려고 반복해서 읽는 건 너무 비효율적임. 기존 AI 도구는 대본 만들어주고 끝이라 연습은 결국 혼자 해야 됨. PPT 올리면 발표문 만들어주고, AI가 진짜 발표하듯 읽어주고(억양·강조·쉬는 타이밍), 이동 중에 반복해서 들으면서 흐름을 체화하고, 내가 연습하면 말 속도·버벅임 피드백까지. "발표는 암기가 아니라 익숙함에서 나온다."',
     organized: {
@@ -447,7 +460,7 @@ export const ideas: Idea[] = [
     authorColor: '#F87171',
     title: 'DJ 곡 구조 분석기',
     emoji: '🎧',
-    gradient: 'linear-gradient(135deg, #A78BFA55, #34D39955)',
+    gradient: 'linear-gradient(135deg, #8694DF22, #3C488333)',
     rawText:
       'DJ가 믹싱 전에 곡 일일이 들으면서 인트로 몇 마디인지, 훅 어디서 시작하는지, 아웃트로 몇 마디 남았는지, 어디서 다음 곡 넣어야 자연스러운지 다 직접 분석해야 됨. 특히 K-POP은 구조 변화 빠르고 보컬 중심이라 초보는 더 어려움. 기존 DJ 프로그램은 BPM, Key, 파형만 보여줌. 음원 올리면 구간별 마디 수 자동으로 뽑아주고 큐 포인트도 찍어주면 좋겠음.',
     organized: {
@@ -472,7 +485,7 @@ export const ideas: Idea[] = [
     authorColor: '#F87171',
     title: 'AI 팀 프로젝트 매니저',
     emoji: '🧶',
-    gradient: 'linear-gradient(135deg, #1E1B4B22, #FCD34D55)',
+    gradient: 'linear-gradient(135deg, #3C488333, #8694DF44)',
     image: '/ideas/i8.jpg',
     rawText:
       '팀플 진짜 병목은 초반 기획임. 시간 안 맞아서 모이기도 힘들고 아이디어는 카톡·메모장·구글 문서에 다 흩어짐. 기획안 정해도 산출물 목록, 역할 분담, 일정이 불분명해서 팀장 한두 명이 다 떠안음. 흩어진 아이디어 한 곳에 모으고, AI가 비동기로 평가하고, 투표로 정하면 AI가 산출물·역할·일정 구조로 자동 변환하고 PPT 초안까지 만들어주는 거. 단순 협업 공간이 아니라 아이디어를 "제출 가능한 결과물"로 바꿔주는 매니저.',
@@ -495,6 +508,24 @@ export const ideas: Idea[] = [
         authorColor: '#FB923C',
         text: '지금 우리 팀이 겪고 있는 그 문제 그대로네요. 우리가 이걸로 이 아이디어톤을 진행하는 그림이 제일 설득력 있을 듯.',
         time: '4분 전',
+        replies: [
+          {
+            id: 'r8-1-1',
+            authorId: 'm1',
+            authorName: '병찬',
+            authorColor: '#F87171',
+            text: '맞아요, 메타로 가는 게 발표에서 가장 강한 그림이에요.',
+            time: '3분 전',
+          },
+          {
+            id: 'r8-1-2',
+            authorId: 'me',
+            authorName: '나',
+            authorColor: '#3C4883',
+            text: '저도 동의. 데모에서 우리 팀 화면을 그대로 보여주는 메타가 임팩트 좋을 거예요.',
+            time: '1분 전',
+          },
+        ],
       },
       {
         id: 'c8-2',
@@ -504,6 +535,16 @@ export const ideas: Idea[] = [
         target: '차별점',
         text: 'Notion·Trello랑 뭐가 다르냐는 질문이 무조건 나올 텐데, "평가→구조화→산출물"이 차별점이라는 걸 한 문장으로 못 박아두면 좋겠어요.',
         time: '11분 전',
+        replies: [
+          {
+            id: 'r8-2-1',
+            authorId: 'm2',
+            authorName: '현준',
+            authorColor: '#FB923C',
+            text: '"아이디어를 제출 가능한 결과물로 바꿔주는 매니저" — 이 한 줄을 hero에 박아두면 어떨까요?',
+            time: '8분 전',
+          },
+        ],
       },
       {
         id: 'c8-3',
@@ -560,20 +601,126 @@ export const notifications: NotificationItem[] = [
   },
 ];
 
+// ============= 플랜 (Wave 비즈니스 모델) ============= //
+export interface PlanDef {
+  key: Plan;
+  name: string;
+  price: string;
+  sub: string;
+  /** 추천 팀 규모 (Plus 4인 / Pro 6인) */
+  teamSize?: string;
+  recommended?: boolean;
+  /** AI 기능 포함 여부 (Free=false, Plus/Pro=true) */
+  aiIncluded: boolean;
+  features: string[];
+}
+
+export const plans: PlanDef[] = [
+  {
+    key: 'free',
+    name: 'Free',
+    price: '무료',
+    sub: '체험·소규모',
+    aiIncluded: false,
+    features: [
+      '게시판형 아이디어 공유 · 댓글 · 답글',
+      '1v1 토너먼트 투표',
+      '단계별 일정 관리',
+      '최종 기획안 피드백 (텍스트)',
+    ],
+  },
+  {
+    key: 'plus',
+    name: 'Plus',
+    price: '9,900원',
+    sub: '/ 팀 / 프로젝트',
+    teamSize: '4인 기준 추천',
+    recommended: true,
+    aiIncluded: true,
+    features: [
+      'Free 의 모든 기능',
+      'AI 페르소나 비평·요약',
+      'AI 썸네일 자동 생성',
+      'AI 최종 산출물 (PPT 초안 · 기획안 · 좋은점/주의점 요약)',
+      'AI 채팅 (사용량 제한)',
+    ],
+  },
+  {
+    key: 'pro',
+    name: 'Pro',
+    price: '19,900원',
+    sub: '/ 팀 / 프로젝트',
+    teamSize: '6인 기준 추천',
+    aiIncluded: true,
+    features: [
+      'Free + Plus 의 모든 기능',
+      'AI 사용량 대폭 확대 (장문 산출물·대량 비평)',
+      '우선 처리 (응답 속도)',
+      'PPT · PDF · Notion · Google Docs export',
+    ],
+  },
+];
+
+// ============= 온보딩 STEP3 프리셋 ============= //
+export const topicPresets = [
+  'AI 협업툴',
+  '교육·러닝',
+  '헬스케어',
+  '환경·지속가능성',
+  '라이프스타일',
+  '엔터테인먼트',
+  '핀테크',
+  '커뮤니티',
+];
+
+export const criterionPresets = [
+  { key: 'feasibility', label: '실현 가능성' },
+  { key: 'unique', label: '차별성' },
+  { key: 'pitch', label: '발표 가능성' },
+  { key: 'market', label: '시장성' },
+  { key: 'impact', label: '임팩트' },
+  { key: 'tech', label: '기술 난이도' },
+];
+
+// ============= 런타임 헬퍼 ============= //
+
+/** 현재 팀의 플랜 (온보딩에서 sessionStorage 저장, 없으면 team.plan) */
+export function getCurrentPlan(): Plan {
+  if (typeof window === 'undefined') return team.plan;
+  const stored = sessionStorage.getItem('weave:plan') as Plan | null;
+  return stored ?? team.plan;
+}
+
+/** 유료 플랜 여부 — Plus/Pro 만 AI 기능 사용 가능 */
+export function isPaidPlan(plan: Plan = getCurrentPlan()): boolean {
+  return plan !== 'free';
+}
+
+/** id 기반 mock 업데이트 시간 (i1~i8 에 일관되게 매핑) */
+const mockUpdates = ['방금', '5분 전', '12분 전', '30분 전', '1시간 전', '3시간 전', '6시간 전', '어제'];
+export function mockUpdatedAt(ideaId: string): string {
+  const idx = ideas.findIndex((i) => i.id === ideaId);
+  if (idx === -1) return '최근';
+  return mockUpdates[idx % mockUpdates.length];
+}
+
 // 화면 리스트 (런처용)
 export const screenList = [
   { num: '00', path: '/prototype/splash', name: '스플래시', desc: '0 → W → 1 로고 애니메이션', star: true },
   { num: '01', path: '/prototype/landing', name: 'Landing', desc: '서비스 소개 + 카카오 로그인' },
-  { num: '03', path: '/prototype/onboarding', name: '온보딩', desc: '프로젝트 유형 → 정보 → 팀 설정' },
-  { num: '04', path: '/prototype/plan', name: '결제 플랜 선택', desc: 'Free / Plus / Pro 비교' },
+  { num: '03', path: '/prototype/onboarding', name: '온보딩', desc: '유형 → 마감 → 주제·기준 → 팀 → 플랜 → 완료 (6 step)' },
+  { num: '04', path: '/prototype/plan', name: '결제 플랜 선택', desc: 'Free / Plus(4인) / Pro(6인) — 업그레이드 전용' },
   { num: '05', path: '/prototype/invite', name: '팀원 초대', desc: '카톡 공유 + 링크 복사' },
   { num: '06', path: '/prototype/join', name: '초대 수락', desc: '팀원이 카톡 링크 클릭 시' },
-  { num: '07', path: '/prototype/team', name: '팀 홈', desc: '5단계 progress + 팀원 상태' },
-  { num: '08', path: '/prototype/idea/new', name: 'F1 자유 입력', desc: '두서없이 아이디어 작성' },
-  { num: '09', path: '/prototype/ideas', name: '아이디어 모아보기', desc: '카드 그리드 (AI 이미지 썸네일)' },
-  { num: '10', path: '/prototype/idea/i1', name: '아이디어 상세', desc: 'AI 정리 + 페르소나 + 댓글', star: true },
-  { num: '11', path: '/prototype/vote', name: '투표', desc: '최종 아이디어 선정 (4가지 기준)' },
-  { num: '12', path: '/prototype/mediate', name: 'AI 충돌 중재', desc: '선정된 아이디어의 합의/충돌 분리', star: true },
-  { num: '13', path: '/prototype/brief', name: '최종 기획안', desc: '1페이지 + Export' },
-  { num: '14', path: '/prototype/notifications', name: '알림', desc: '댓글·평가·AI 알림' },
+  { num: '07', path: '/prototype/team', name: '팀 홈', desc: '진행 단계 + 아이디어 피드 + 플로팅 액션', star: true },
+  { num: '08', path: '/prototype/idea/new', name: '아이디어 작성', desc: '두서없이 작성 → AI 가 정리' },
+  { num: '09', path: '/prototype/ideas', name: '아이디어 목록', desc: '카드 그리드 + 정렬' },
+  { num: '10', path: '/prototype/idea/i8', name: '아이디어 상세', desc: 'AI 정리 · 페르소나 · 댓글·답글', star: true },
+  { num: '11', path: '/prototype/idea/i8/edit', name: '아이디어 수정', desc: '무료: 텍스트 수정 · 유료: AI 재정리' },
+  { num: '12', path: '/prototype/vote', name: '투표', desc: '1v1 라운드로빈 대결' },
+  { num: '13', path: '/prototype/vote/result', name: '투표 결과', desc: '순위만 공개 · 재투표 요청', star: true },
+  { num: '14', path: '/prototype/brief', name: '최종 기획안', desc: '좋은점·주의점 요약 + Export', star: true },
+  { num: '15', path: '/prototype/chat', name: 'AI 채팅', desc: '유료 전용 — 팀과 AI 가 함께 (페이월)' },
+  { num: '16', path: '/prototype/notifications', name: '알림', desc: '댓글·평가·AI 알림' },
+  { num: '17', path: '/prototype/mediate', name: 'AI 충돌 중재 (legacy)', desc: '구버전 — FinalBrief 의 요약으로 흡수됨' },
 ];
