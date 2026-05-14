@@ -4,15 +4,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Core (Thread direction)
-        primary: '#1E1B4B',
-        accent: '#B45309',
-        'accent-soft': '#FCD34D',
-        paper: '#F5F0E6',
-        surface: '#FFFAF0',
-        'surface-alt': '#FAFAF9',
-        border: '#E7DFD0',
-        muted: '#78716C',
+        // Core (Wave direction) — blue/purple scale
+        primary: '#566CCC',         // 메인
+        'primary-light': '#8694DF', // 보조
+        'primary-dark': '#3C4883',  // 딥 강조
+        // accent 토큰은 호환을 위해 유지하되 primary scale 의 alias 로 동작
+        accent: '#3C4883',        // = primary-dark (강조)
+        'accent-soft': '#E8EBF7', // 옅은 primary 틴트 (배지·하이라이트 bg)
+        // Cool 뉴트럴 surfaces
+        paper: '#F6F7FB',
+        surface: '#FFFFFF',
+        'surface-alt': '#EEF1F8',
+        border: '#E3E6F0',
+        muted: '#64748B',
         // Personas
         persona: {
           user: '#FB923C',
@@ -50,9 +54,16 @@ export default {
         xl: '18px',
       },
       boxShadow: {
-        sm: '0 1px 2px rgba(15,23,42,0.05)',
-        md: '0 4px 12px rgba(15,23,42,0.08)',
-        lg: '0 12px 32px rgba(15,23,42,0.12)',
+        // Blue-tinted shadows — base = primary-dark #3C4883
+        sm: '0 1px 2px rgba(60,72,131,0.06)',
+        md: '0 4px 14px rgba(60,72,131,0.10)',
+        lg: '0 12px 36px rgba(60,72,131,0.14)',
+      },
+      transitionTimingFunction: {
+        wave: 'cubic-bezier(0.22, 0.61, 0.36, 1)',
+      },
+      transitionDuration: {
+        wave: '600ms',
       },
       letterSpacing: {
         tight: '-0.02em',

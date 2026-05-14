@@ -6,15 +6,17 @@
 
 @layer base {
   :root {
-    /* Core (Thread direction) */
-    --color-primary: #1E1B4B;
-    --color-accent: #B45309;
-    --color-accent-soft: #FCD34D;
-    --color-paper: #F5F0E6;
-    --color-surface: #FFFAF0;
-    --color-surface-alt: #FAFAF9;
-    --color-border: #E7DFD0;
-    --color-muted: #78716C;
+    /* Core (Wave direction) — blue/purple primary scale */
+    --color-primary: #566CCC;       /* 메인 */
+    --color-primary-light: #8694DF; /* 보조 */
+    --color-primary-dark: #3C4883;  /* 딥 강조 */
+    --color-accent: #3C4883;        /* = primary-dark (호환용 alias) */
+    --color-accent-soft: #E8EBF7;   /* 옅은 primary 틴트 (배지·하이라이트 bg) */
+    --color-paper: #F6F7FB;
+    --color-surface: #FFFFFF;
+    --color-surface-alt: #EEF1F8;
+    --color-border: #E3E6F0;
+    --color-muted: #64748B;
 
     /* Personas */
     --persona-user: #FB923C;
@@ -36,7 +38,7 @@
   }
 
   html, body {
-    @apply bg-paper text-primary;
+    @apply bg-paper text-primary-dark;
     font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
     letter-spacing: -0.02em;
     font-synthesis: none;
@@ -67,12 +69,12 @@
   .card:hover { @apply shadow-md; }
 
   .input {
-    @apply w-full bg-surface-alt border border-border rounded-md px-4 py-3 text-[15px] text-primary placeholder:text-muted focus:outline-none focus:border-primary transition-colors;
+    @apply w-full bg-surface-alt border border-border rounded-md px-4 py-3 text-[15px] text-primary-dark placeholder:text-muted focus:outline-none focus:border-primary transition-colors;
   }
 
   /* ============= Markdown ============= */
   .markdown {
-    @apply text-primary text-[15px] leading-relaxed;
+    @apply text-primary-dark text-[15px] leading-relaxed;
   }
   .markdown > * + * { @apply mt-4; }
   .markdown h1 {
@@ -94,7 +96,7 @@
   .markdown a {
     @apply text-accent font-semibold underline-offset-2 hover:underline;
   }
-  .markdown strong { @apply font-bold text-primary; }
+  .markdown strong { @apply font-bold text-primary-dark; }
   .markdown em { @apply italic; }
   .markdown code {
     @apply bg-surface px-1.5 py-0.5 rounded-sm text-[13px] font-mono text-accent border border-border;
@@ -103,7 +105,7 @@
     @apply bg-surface border border-border rounded-md p-4 overflow-x-auto my-4;
   }
   .markdown pre code {
-    @apply bg-transparent border-0 p-0 text-primary text-[13px] leading-relaxed;
+    @apply bg-transparent border-0 p-0 text-primary-dark text-[13px] leading-relaxed;
   }
   .markdown ul, .markdown ol {
     @apply pl-6 space-y-1;
@@ -115,7 +117,7 @@
     @apply border-l-4 border-accent-soft bg-surface pl-4 pr-3 py-3 my-4 rounded-r-md text-muted;
   }
   .markdown blockquote > * { @apply text-muted; }
-  .markdown blockquote strong { @apply text-primary; }
+  .markdown blockquote strong { @apply text-primary-dark; }
   .markdown table {
     @apply w-full text-[13px] border-collapse my-4;
   }
@@ -123,9 +125,9 @@
     @apply border border-border px-3 py-2 text-left align-top;
   }
   .markdown th {
-    @apply bg-surface font-bold text-primary;
+    @apply bg-surface font-bold text-primary-dark;
   }
-  .markdown td { @apply text-primary/90; }
+  .markdown td { @apply text-primary-dark/90; }
   .markdown hr {
     @apply border-0 border-t border-border my-8;
   }
