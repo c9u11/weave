@@ -1,426 +1,261 @@
-import { useState, useMemo } from 'react';
-import type { KeyboardEvent } from 'react';
+import { useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  Sparkles, RotateCw, ArrowLeft, MessageSquare, Bot, Star, ThumbsUp,
-  ArrowRight, AtSign, Send, Clock, CornerDownRight, Pencil,
-} from 'lucide-react';
-import { PrototypeLayout } from '../../prototype/PrototypeLayout';
-import { Button } from '../../components/ui/Button';
+import { ArrowLeft, Heart, MessageSquare } from 'lucide-react';
+import { ideas, type Comment } from '../../prototype/data';
 import { Avatar } from '../../components/ui/Avatar';
-import { Badge } from '../../components/ui/Badge';
-import { ideas, currentUser, mockUpdatedAt, type Comment, type Reply } from '../../prototype/data';
 
-const organizeKeys = [
-  { key: 'problem' as const, label: '문제 정의' },
-  { key: 'feature' as const, label: '핵심 기능' },
-  { key: 'target' as const, label: '타깃' },
-  { key: 'differentiator' as const, label: '차별점' },
-  { key: 'risk' as const, label: '리스크' },
-];
+/**
+ * 아이디어 상세 (Figma "아이디어 상세.png" / "아이디어 상세-1.png").
+ * - 헤더: back chevron
+ * - 타이틀 + 작성자 행
+ * - 이미지 갤러리 (가로 스크롤)
+ * - 본문 섹션: 아이디어 설명 / 핵심 기능 / 타깃 / 차별성 / 리스크
+ * - 하단 액션 바: 좋아요 + 댓글 카운트
+ * - 댓글 클릭 시 BottomSheet 으로 댓글 목록 노출
+ */
+
+const HEART_COUNT = 6;
 
 export default function IdeaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const idea = ideas.find((i) => i.id === id);
-  const [tab, setTab] = useState<'persona' | 'comments'>('persona');
-  const [activeTarget, setActiveTarget] = useState<string | null>(null);
-  const [comments, setComments] = useState<Comment[]>(idea?.comments ?? []);
-  const [draft, setDraft] = useState('');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyDraft, setReplyDraft] = useState('');
-  const isMyIdea = idea?.authorId === currentUser.id;
+  const idea = ideas.find((i) => i.id === id) ?? ideas[0];
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [liked, setLiked] = useState(false);
 
-  const commentsByTarget = useMemo(
-    () =>
-      comments.reduce<Record<string, Comment[]>>((acc, c) => {
-        const key = c.target || '_general';
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(c);
-        return acc;
-      }, {}),
-    [comments]
-  );
-
-  if (!idea) {
-    return (
-      <PrototypeLayout title="아이디어를 찾을 수 없어요">
-        <Link to="/prototype/ideas" className="text-accent">
-          ← 모아보기로
-        </Link>
-      </PrototypeLayout>
-    );
-  }
-
-  const submitComment = () => {
-    const text = draft.trim();
-    if (!text) return;
-    const newComment: Comment = {
-      id: `c-${Date.now()}`,
-      authorId: currentUser.id,
-      authorName: currentUser.name,
-      authorColor: currentUser.color,
-      target: activeTarget || undefined,
-      text,
-      time: '방금',
-    };
-    setComments((prev) => [newComment, ...prev]);
-    setDraft('');
-  };
-
-  const onKey = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      submitComment();
-    }
-  };
-
-  const submitReply = (commentId: string) => {
-    const text = replyDraft.trim();
-    if (!text) return;
-    const newReply: Reply = {
-      id: `r-${Date.now()}`,
-      authorId: currentUser.id,
-      authorName: currentUser.name,
-      authorColor: currentUser.color,
-      text,
-      time: '방금',
-    };
-    setComments((prev) =>
-      prev.map((c) =>
-        c.id === commentId ? { ...c, replies: [...(c.replies ?? []), newReply] } : c
-      )
-    );
-    setReplyDraft('');
-    setReplyingTo(null);
-  };
+  // organized 필드를 ' / ' 기준으로 bullet 리스트화
+  const featureBullets = splitBullets(idea.organized.feature);
+  const targetBullets = splitBullets(idea.organized.target);
+  const differentiatorBullets = splitBullets(idea.organized.differentiator);
+  const riskBullets = splitBullets(idea.organized.risk);
 
   return (
-    <PrototypeLayout wide showBell bellCount={3}>
-      {/* Breadcrumb */}
-      <div className="flex items-center gap-2 text-[12px] text-muted mb-4 flex-wrap">
-        <Link to="/prototype/ideas" className="flex items-center gap-1 hover:text-primary">
-          <ArrowLeft size={14} /> 모아보기
-        </Link>
-        <span>·</span>
-        <Avatar initial={idea.authorName[0]} color={idea.authorColor} size="sm" className="!w-5 !h-5 !text-[10px]" />
-        <span className="text-primary-dark font-semibold">{idea.authorName}</span>
-        <span>·</span>
-        <span className="flex items-center gap-1">
-          <Clock size={11} /> {mockUpdatedAt(idea.id)} 업데이트
-        </span>
-        <Link
-          to={`/prototype/idea/${idea.id}/edit`}
-          className="ml-auto flex items-center gap-1 text-primary font-semibold hover:underline"
+    <div className="min-h-screen bg-paper">
+      <main className="max-w-[440px] mx-auto px-5 pt-3 pb-28">
+        <button
+          onClick={() => navigate(-1)}
+          className="-ml-2 p-2 text-slate-900 hover:text-primary transition-colors"
+          aria-label="뒤로"
         >
-          <Pencil size={12} /> {isMyIdea ? '내 아이디어 수정' : '수정 보기'}
-        </Link>
-      </div>
+          <ArrowLeft size={24} />
+        </button>
 
-      <div className="grid lg:grid-cols-3 gap-6">
-        {/* ============= MAIN ============= */}
-        <div className="lg:col-span-2 space-y-5">
-          {/* Hero image */}
-          <div
-            className="relative h-56 sm:h-72 rounded-lg flex items-center justify-center text-7xl overflow-hidden"
-            style={{ background: idea.gradient }}
-          >
+        <h1 className="mt-3 text-[22px] font-bold tracking-tight text-slate-900">
+          {idea.title}
+        </h1>
+
+        <div className="mt-3 flex items-center gap-2">
+          <Avatar initial={idea.authorName[0]} color={idea.authorColor} size="sm" />
+          <span className="text-sm font-semibold text-slate-900">{idea.authorName}</span>
+        </div>
+
+        {/* 이미지 갤러리 — 가로 스크롤 */}
+        <div className="mt-5 -mx-5 px-5 overflow-x-auto">
+          <div className="flex gap-2 snap-x snap-mandatory pb-2">
             {idea.image ? (
-              <img
-                src={idea.image}
-                alt={idea.title}
-                className="absolute inset-0 w-full h-full object-cover object-top"
-              />
+              <>
+                <GalleryCard src={idea.image} alt={idea.title} />
+                <GalleryCard src={idea.image} alt={idea.title} dim />
+                <GalleryCard src={idea.image} alt={idea.title} dim />
+              </>
             ) : (
-              idea.emoji
+              <div
+                className="snap-start shrink-0 w-[280px] aspect-[4/3] rounded-xl border border-border flex items-center justify-center text-6xl"
+                style={{ background: idea.gradient }}
+              >
+                {idea.emoji}
+              </div>
             )}
-            <div className="absolute bottom-3 right-3 flex gap-2">
-              <button className="flex items-center gap-1 bg-primary/85 text-paper text-[11px] font-bold px-3 py-1.5 rounded-full hover:bg-primary transition-colors">
-                <Sparkles size={12} /> AI 생성
-              </button>
-              <button className="flex items-center gap-1 bg-primary/85 text-paper text-[11px] font-bold px-3 py-1.5 rounded-full hover:bg-primary transition-colors">
-                <RotateCw size={12} /> 다시
-              </button>
-            </div>
-          </div>
-
-          <h1 className="text-2xl font-bold tracking-tighter text-primary">
-            {idea.title}
-          </h1>
-
-          {/* Raw text */}
-          <div>
-            <h3 className="text-[11px] font-bold text-muted uppercase tracking-wider mb-2">
-              📝 원문
-            </h3>
-            <div className="text-[14px] text-muted leading-relaxed bg-surface border border-border rounded-md p-4 italic">
-              "{idea.rawText}"
-            </div>
-          </div>
-
-          {/* AI organized */}
-          <div>
-            <h3 className="text-[11px] font-bold text-muted uppercase tracking-wider mb-2 flex items-center gap-1.5">
-              <Bot size={12} /> AI 정리 — 항목을 클릭하면 댓글 달기
-            </h3>
-            <div className="space-y-2">
-              {organizeKeys.map(({ key, label }) => {
-                const value = idea.organized[key];
-                const targetComments = commentsByTarget[label] || [];
-                const hasComments = targetComments.length > 0;
-                const isActive = activeTarget === label;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setTab('comments');
-                      setActiveTarget(isActive ? null : label);
-                    }}
-                    className={`w-full text-left p-3 rounded-md border transition-all relative ${
-                      hasComments
-                        ? 'bg-accent-soft/30 border-accent-soft/60 hover:bg-accent-soft/40'
-                        : 'bg-surface border-border hover:border-primary/30'
-                    } ${isActive ? 'ring-2 ring-accent ring-offset-2 ring-offset-paper' : ''}`}
-                  >
-                    <div className="text-[12px] font-bold text-primary mb-0.5">{label}</div>
-                    <div className="text-[13px] text-muted leading-relaxed">{value}</div>
-                    {hasComments && (
-                      <div className="absolute -top-2 -right-2 bg-primary text-paper text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <MessageSquare size={9} />
-                        {targetComments.length}
-                      </div>
-                    )}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap items-center gap-2 pt-2">
-            <Button variant="outline" size="sm" leftIcon={<ThumbsUp size={14} />}>
-              동의 (3)
-            </Button>
-            <Button variant="outline" size="sm" leftIcon={<Star size={14} />}>
-              평가하기
-            </Button>
-            <div className="flex items-center gap-1 text-[12px] text-muted ml-auto">
-              <Star size={12} className="text-accent fill-accent-soft" />
-              <strong className="text-primary">{idea.rating}</strong>
-            </div>
           </div>
         </div>
 
-        {/* ============= SIDEBAR ============= */}
-        <aside className="lg:col-span-1">
-          <div className="sticky top-20 bg-surface border border-border rounded-lg overflow-hidden">
-            <div className="flex border-b border-border">
-              <button
-                onClick={() => setTab('persona')}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[12px] font-bold transition-colors ${
-                  tab === 'persona'
-                    ? 'bg-primary text-paper'
-                    : 'text-muted hover:text-primary'
-                }`}
-              >
-                <Bot size={14} /> 페르소나 (4)
-              </button>
-              <button
-                onClick={() => setTab('comments')}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-3 text-[12px] font-bold transition-colors ${
-                  tab === 'comments'
-                    ? 'bg-primary text-paper'
-                    : 'text-muted hover:text-primary'
-                }`}
-              >
-                <MessageSquare size={14} /> 댓글 ({comments.length})
-              </button>
-            </div>
+        <div className="mt-2 text-right">
+          <Link
+            to={`/prototype/idea/${idea.id}/edit`}
+            className="text-xs text-muted hover:text-primary-dark transition-colors"
+          >
+            더 자세히 보기 →
+          </Link>
+        </div>
 
-            <div className="p-3 max-h-[600px] overflow-y-auto">
-              {tab === 'persona' &&
-                idea.personas.map((p) => (
-                  <div key={p.key} className="mb-3 last:mb-0 bg-paper border border-border rounded-md p-3">
-                    <div className="flex items-start gap-2.5">
-                      <Avatar initial={p.initial} color={p.color} size="sm" />
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[12px] font-bold text-primary">
-                          {p.name}
-                        </div>
-                        <div className="text-[12px] text-muted italic mt-1 leading-relaxed">
-                          "{p.quote}"
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+        {/* 본문 섹션들 */}
+        <Section title="아이디어 설명">
+          <p className="text-sm text-slate-900 leading-7">{idea.organized.problem}</p>
+        </Section>
 
-              {tab === 'comments' && (
-                <>
-                  {comments.length === 0 ? (
-                    <p className="text-center text-[12px] text-muted py-8">
-                      아직 댓글이 없어요. 첫 댓글을 달아보세요.
-                    </p>
-                  ) : (
-                    comments.map((c) => (
-                      <div
-                        key={c.id}
-                        className={`mb-3 last:mb-0 bg-paper border rounded-md p-3 transition-all ${
-                          activeTarget && c.target === activeTarget
-                            ? 'border-primary shadow-sm'
-                            : 'border-border'
-                        }`}
-                      >
-                        <div className="flex items-start gap-2.5">
-                          <Avatar initial={c.authorName[0]} color={c.authorColor} size="sm" />
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 flex-wrap">
-                              <span className="text-[12px] font-bold text-primary-dark">
-                                {c.authorName}
-                              </span>
-                              {c.target && (
-                                <Badge variant="soft" className="!text-[10px]">
-                                  <AtSign size={9} />
-                                  {c.target}
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-[12px] text-primary-dark/85 leading-relaxed mt-1.5">
-                              {c.text}
-                            </p>
-                            <div className="flex items-center gap-3 mt-1.5">
-                              <span className="text-[10px] text-muted/70">{c.time}</span>
-                              <button
-                                onClick={() => {
-                                  setReplyingTo(replyingTo === c.id ? null : c.id);
-                                  setReplyDraft('');
-                                }}
-                                className="text-[10px] font-bold text-primary hover:underline flex items-center gap-0.5"
-                              >
-                                <CornerDownRight size={10} />
-                                답글
-                              </button>
-                            </div>
-                          </div>
-                        </div>
+        <Section title="핵심 기능">
+          <BulletList items={featureBullets} />
+        </Section>
 
-                        {/* 답글 목록 */}
-                        {c.replies && c.replies.length > 0 && (
-                          <div className="mt-3 pl-7 space-y-2 border-l-2 border-border ml-3">
-                            {c.replies.map((r) => (
-                              <div key={r.id} className="flex items-start gap-2 pl-2">
-                                <Avatar
-                                  initial={r.authorName[0]}
-                                  color={r.authorColor}
-                                  size="sm"
-                                  className="!w-5 !h-5 !text-[10px]"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="text-[11px] font-bold text-primary-dark">
-                                      {r.authorName}
-                                    </span>
-                                    <span className="text-[10px] text-muted/70">{r.time}</span>
-                                  </div>
-                                  <p className="text-[11.5px] text-primary-dark/80 leading-relaxed mt-0.5">
-                                    {r.text}
-                                  </p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
+        <Section title="타깃">
+          <BulletList items={targetBullets} />
+        </Section>
 
-                        {/* 답글 입력 */}
-                        {replyingTo === c.id && (
-                          <div className="mt-3 pl-7 ml-3 border-l-2 border-primary/40">
-                            <div className="flex gap-2 pl-2">
-                              <input
-                                value={replyDraft}
-                                onChange={(e) => setReplyDraft(e.target.value)}
-                                onKeyDown={(e) => {
-                                  if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    submitReply(c.id);
-                                  }
-                                }}
-                                placeholder={`${c.authorName} 님에게 답글...`}
-                                autoFocus
-                                className="input !py-1.5 !text-[11.5px] flex-1"
-                              />
-                              <Button
-                                variant="primary"
-                                size="sm"
-                                onClick={() => submitReply(c.id)}
-                                disabled={!replyDraft.trim()}
-                                className="!px-2 !py-1.5"
-                              >
-                                <Send size={11} />
-                              </Button>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))
-                  )}
+        <Section title="차별성">
+          <BulletList items={differentiatorBullets} />
+        </Section>
 
-                  <div className="mt-4 pt-3 border-t border-border space-y-2">
-                    {activeTarget && (
-                      <div className="flex items-center gap-1.5 text-[11px] text-accent font-bold">
-                        <AtSign size={10} />
-                        "{activeTarget}"에 댓글 달기
-                        <button
-                          onClick={() => setActiveTarget(null)}
-                          className="ml-auto text-muted hover:text-primary"
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    )}
-                    <div className="flex gap-2">
-                      <input
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        onKeyDown={onKey}
-                        placeholder={activeTarget ? `"${activeTarget}" 에 의견을...` : '댓글 추가... (Enter)'}
-                        className="input !py-2 !text-[12px] flex-1"
-                      />
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        onClick={submitComment}
-                        disabled={!draft.trim()}
-                        className="!px-3"
-                      >
-                        <Send size={13} />
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )}
-            </div>
-          </div>
-        </aside>
+        <Section title="리스크">
+          <BulletList items={riskBullets} />
+        </Section>
+      </main>
+
+      {/* 하단 액션 바 */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-border">
+        <div className="max-w-[440px] mx-auto px-5 py-3 flex items-center gap-5">
+          <button
+            onClick={() => setLiked((v) => !v)}
+            className="flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark transition-colors"
+            aria-pressed={liked}
+          >
+            <Heart
+              size={20}
+              className={liked ? 'fill-danger text-danger' : ''}
+            />
+            {HEART_COUNT + (liked ? 1 : 0)}
+          </button>
+          <button
+            onClick={() => setSheetOpen(true)}
+            className="flex items-center gap-1.5 text-sm text-muted hover:text-primary-dark transition-colors"
+          >
+            <MessageSquare size={20} />
+            {idea.comments.length}
+          </button>
+        </div>
       </div>
 
-      <div className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md sm:max-w-none mx-auto">
-        <Button
-          variant="outline"
-          fullWidth
-          leftIcon={<ArrowLeft size={14} />}
-          onClick={() => navigate('/prototype/ideas')}
-        >
-          모아보기
-        </Button>
-        <Button
-          variant="primary"
-          fullWidth
-          rightIcon={<ArrowRight size={14} />}
-          onClick={() => navigate('/prototype/vote')}
-        >
-          투표하러 가기
-        </Button>
-      </div>
-    </PrototypeLayout>
+      {sheetOpen && (
+        <CommentSheet
+          comments={idea.comments}
+          authorName={idea.authorName}
+          onClose={() => setSheetOpen(false)}
+        />
+      )}
+    </div>
   );
+}
+
+interface SectionProps {
+  title: string;
+  children: React.ReactNode;
+}
+function Section({ title, children }: SectionProps) {
+  return (
+    <section className="mt-7">
+      <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2>
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((item, idx) => (
+        <li key={idx} className="text-sm text-slate-900 leading-7 flex gap-2">
+          <span className="text-muted flex-shrink-0">·</span>
+          <span className="flex-1">{item}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function GalleryCard({ src, alt, dim }: { src: string; alt: string; dim?: boolean }) {
+  return (
+    <div
+      className={`snap-start shrink-0 w-[280px] aspect-[4/3] rounded-xl border border-border overflow-hidden bg-surface-alt ${
+        dim ? 'opacity-90' : ''
+      }`}
+    >
+      <img src={src} alt={alt} loading="lazy" className="w-full h-full object-cover object-top" />
+    </div>
+  );
+}
+
+/**
+ * 댓글 시트 — 배경 dim + 하단에서 올라오는 시트.
+ * 시안에는 시트가 화면 ~60% 차지하고 댓글 목록 + 하단 입력.
+ */
+interface CommentSheetProps {
+  comments: Comment[];
+  authorName: string;
+  onClose: () => void;
+}
+function CommentSheet({ comments, authorName, onClose }: CommentSheetProps) {
+  return (
+    <div className="fixed inset-0 z-40">
+      {/* dim */}
+      <button
+        aria-label="닫기"
+        onClick={onClose}
+        className="absolute inset-0 bg-slate-900/40"
+      />
+
+      {/* sheet */}
+      <div className="absolute bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white rounded-t-3xl shadow-lg max-h-[85vh] flex flex-col">
+        {/* drag handle */}
+        <div className="pt-3 pb-1 flex justify-center">
+          <button
+            aria-label="시트 닫기"
+            onClick={onClose}
+            className="block w-10 h-1 rounded-full bg-border"
+          />
+        </div>
+
+        <div className="px-5 pt-2 pb-3">
+          <h2 className="text-lg font-bold tracking-tight text-slate-900">댓글</h2>
+        </div>
+
+        {/* 댓글 목록 */}
+        <div className="flex-1 overflow-y-auto px-5 pb-2 space-y-5">
+          {comments.map((c) => {
+            const isAuthor = c.authorName === authorName;
+            return (
+              <div key={c.id} className="flex gap-3">
+                <Avatar
+                  initial={c.authorName[0]}
+                  color={c.authorColor}
+                  size="sm"
+                  className="!w-9 !h-9 !text-[13px] flex-shrink-0"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-semibold text-slate-900">
+                      {c.authorName}
+                    </span>
+                    <span className="text-xs text-muted">{c.time}</span>
+                    {isAuthor && (
+                      <span className="text-xs font-semibold text-primary">작성자</span>
+                    )}
+                  </div>
+                  <p className="mt-1 text-sm text-slate-900 leading-relaxed">{c.text}</p>
+                  <button className="mt-1 text-xs font-semibold text-muted hover:text-primary-dark transition-colors">
+                    답글
+                  </button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* 댓글 입력 — 자기 아바타 + input */}
+        <div className="border-t border-border px-5 py-3 flex items-center gap-3 bg-white">
+          <Avatar initial="나" color="#3C4883" size="sm" className="!w-9 !h-9 !text-[13px] flex-shrink-0" />
+          <input
+            type="text"
+            placeholder="댓글을 입력해주세요."
+            className="flex-1 h-11 px-4 rounded-2xl border border-border bg-surface-alt text-sm placeholder:text-muted focus:outline-none focus:border-primary transition-colors"
+          />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function splitBullets(text: string): string[] {
+  return text
+    .split(/\s*\/\s*/)
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
