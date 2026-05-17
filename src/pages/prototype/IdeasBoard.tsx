@@ -1,13 +1,19 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
-import { Plus, Star, MessageSquare, Sparkles, ArrowRight, ArrowUpDown, Clock } from 'lucide-react';
-import { PrototypeLayout } from '../../prototype/PrototypeLayout';
-import { StageBackLink } from '../../prototype/StageBackLink';
+import { ArrowLeft, Plus, Star, MessageSquare, Clock } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { ideas as baseIdeas, notifications } from '../../prototype/data';
+import { ideas as baseIdeas } from '../../prototype/data';
+
+/**
+ * 아이디어 목록 (홈 "더보기" 진입).
+ * - 헤더: back + 타이틀 + 추가 버튼
+ * - 정렬 칩
+ * - 2열 카드 그리드 (이미지 + 타이틀 + 메트릭)
+ * - 하단 CTA: 투표로 이동
+ */
 
 type SortKey = 'rating' | 'comments' | 'recent';
-const sortOptions: { key: SortKey; label: string; icon: typeof Star }[] = [
+const SORTS: { key: SortKey; label: string; icon: typeof Star }[] = [
   { key: 'rating', label: '별점순', icon: Star },
   { key: 'comments', label: '댓글 많은', icon: MessageSquare },
   { key: 'recent', label: '최신순', icon: Clock },
@@ -29,7 +35,6 @@ interface DraftIdea {
 
 export default function IdeasBoard() {
   const navigate = useNavigate();
-  const unread = notifications.filter((n) => n.unread).length;
   const [sort, setSort] = useState<SortKey>('rating');
 
   const newIdeas = useMemo<DraftIdea[]>(() => {
@@ -44,12 +49,9 @@ export default function IdeasBoard() {
   const allIdeas = useMemo(() => {
     const merged = [...baseIdeas, ...newIdeas];
     const sorted = [...merged];
-    if (sort === 'rating') {
-      sorted.sort((a, b) => b.rating - a.rating);
-    } else if (sort === 'comments') {
-      sorted.sort((a, b) => b.commentsCount - a.commentsCount);
-    } else if (sort === 'recent') {
-      // 새로 작성한 게 가장 위, 그 다음 기본 목록은 역순(i8 → i1) 으로 "최근"
+    if (sort === 'rating') sorted.sort((a, b) => b.rating - a.rating);
+    else if (sort === 'comments') sorted.sort((a, b) => b.commentsCount - a.commentsCount);
+    else {
       sorted.sort((a, b) => {
         const aNew = a.id.startsWith('new-') ? 1 : 0;
         const bNew = b.id.startsWith('new-') ? 1 : 0;
@@ -61,128 +63,128 @@ export default function IdeasBoard() {
   }, [newIdeas, sort]);
 
   return (
-    <PrototypeLayout showBell bellCount={unread} phoneWidth={false}>
-      <StageBackLink />
-      <p className="text-[11px] text-muted mb-1 uppercase tracking-wider font-bold">
-        2단계 — 모아보기
-      </p>
-      <div className="flex items-end justify-between mb-4">
-        <h1 className="text-2xl font-bold tracking-tighter text-primary-dark">
-          팀의 아이디어 ({allIdeas.length})
-        </h1>
-        <Button
-          variant="outline"
-          size="sm"
-          leftIcon={<Plus size={14} />}
-          onClick={() => navigate('/prototype/idea/new')}
-        >
-          추가
-        </Button>
-      </div>
-
-      {/* ====== 정렬 ====== */}
-      <div className="flex items-center gap-1.5 mb-4 overflow-x-auto pb-1">
-        <span className="text-[11px] text-muted flex items-center gap-1 flex-shrink-0 mr-1">
-          <ArrowUpDown size={11} /> 정렬
-        </span>
-        {sortOptions.map(({ key, label, icon: Icon }) => {
-          const active = sort === key;
-          return (
-            <button
-              key={key}
-              onClick={() => setSort(key)}
-              className={`flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-full border transition-colors flex-shrink-0 ${
-                active
-                  ? 'bg-primary text-paper border-primary'
-                  : 'bg-surface text-muted border-border hover:border-primary/40'
-              }`}
-            >
-              <Icon size={11} />
-              {label}
-            </button>
-          );
-        })}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {allIdeas.map((idea) => {
-          const isNew = idea.id.startsWith('new-');
-          // 새로 추가된 아이디어는 detail 페이지를 만들지 않았으므로 i1으로 fallback
-          const detailPath = isNew ? '/prototype/idea/i1' : `/prototype/idea/${idea.id}`;
-          return (
-            <Link
-              key={idea.id}
-              to={detailPath}
-              className="group bg-surface border border-border rounded-lg overflow-hidden hover:border-primary/30 hover:shadow-md transition-all flex flex-col"
-            >
-              <div
-                className="relative h-32 flex items-center justify-center text-5xl overflow-hidden"
-                style={{ background: idea.gradient }}
-              >
-                {idea.image ? (
-                  <img
-                    src={idea.image}
-                    alt={idea.title}
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover object-top"
-                  />
-                ) : (
-                  idea.emoji
-                )}
-                <div className="absolute top-2 right-2 flex items-center gap-1 bg-primary/70 text-paper text-[10px] font-bold px-2 py-1 rounded-full">
-                  <Sparkles size={10} />
-                  AI 생성
-                </div>
-                {isNew && (
-                  <div className="absolute top-2 left-2 bg-success text-white text-[10px] font-bold px-2 py-1 rounded-full">
-                    NEW
-                  </div>
-                )}
-              </div>
-              <div className="p-3 flex flex-col flex-1">
-                <div className="text-[10px] font-bold text-accent">
-                  👤 {idea.authorName}
-                </div>
-                <h3 className="text-[14px] font-bold text-primary mt-0.5 leading-tight">
-                  {idea.title}
-                </h3>
-                <div className="flex items-center gap-3 mt-2 text-[11px] text-muted">
-                  <span className="flex items-center gap-1">
-                    <Star size={11} className="text-accent" />
-                    {idea.rating}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MessageSquare size={11} />
-                    {idea.commentsCount}
-                  </span>
-                </div>
-              </div>
-            </Link>
-          );
-        })}
+    <div className="min-h-screen bg-paper">
+      <main className="max-w-[440px] mx-auto px-5 pt-3 pb-32">
         <button
-          onClick={() => navigate('/prototype/idea/new')}
-          className="group border-2 border-dashed border-border rounded-lg flex flex-col items-center justify-center text-muted hover:border-primary/40 hover:text-primary transition-all py-10"
+          onClick={() => navigate(-1)}
+          className="-ml-2 p-2 text-slate-900 hover:text-primary transition-colors"
+          aria-label="뒤로"
         >
-          <Plus size={24} />
-          <span className="text-[12px] font-bold mt-2">내 아이디어 추가</span>
+          <ArrowLeft size={24} />
         </button>
-      </div>
 
-      <div className="mt-8 max-w-md mx-auto space-y-2">
-        <Button
-          variant="primary"
-          fullWidth
-          size="lg"
-          rightIcon={<ArrowRight size={16} />}
-          onClick={() => navigate('/prototype/vote')}
-        >
-          다음 단계 — 투표하기
-        </Button>
-        <p className="text-[11px] text-muted text-center">
-          모든 아이디어에 피드백·평가 완료 시 투표로 진행
-        </p>
+        <div className="mt-3 flex items-end justify-between">
+          <h1 className="text-[22px] font-bold tracking-tight text-slate-900">
+            아이디어 목록
+            <span className="ml-2 text-sm font-semibold text-muted">
+              {allIdeas.length}
+            </span>
+          </h1>
+          <button
+            onClick={() => navigate('/prototype/idea/new')}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-dark transition-colors"
+          >
+            <Plus size={16} />
+            추가
+          </button>
+        </div>
+
+        {/* 정렬 칩 */}
+        <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1">
+          {SORTS.map(({ key, label, icon: Icon }) => {
+            const active = sort === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setSort(key)}
+                className={`inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold flex-shrink-0 transition-colors ${
+                  active
+                    ? 'bg-primary text-white'
+                    : 'bg-white border border-border text-muted hover:border-primary/40'
+                }`}
+              >
+                <Icon size={12} />
+                {label}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* 그리드 */}
+        <div className="mt-5 grid grid-cols-2 gap-3">
+          {allIdeas.map((idea) => {
+            const isNew = idea.id.startsWith('new-');
+            const detailPath = isNew ? '/prototype/idea/i1' : `/prototype/idea/${idea.id}`;
+            return (
+              <Link
+                key={idea.id}
+                to={detailPath}
+                className="group bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 transition-colors"
+              >
+                <div
+                  className="relative aspect-square bg-surface-alt flex items-center justify-center text-5xl"
+                  style={{ background: idea.image ? undefined : idea.gradient }}
+                >
+                  {idea.image ? (
+                    <img
+                      src={idea.image}
+                      alt={idea.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover object-top"
+                    />
+                  ) : (
+                    idea.emoji
+                  )}
+                  {isNew && (
+                    <span className="absolute top-2 left-2 bg-success text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      NEW
+                    </span>
+                  )}
+                </div>
+                <div className="p-3">
+                  <div className="text-[11px] text-muted">{idea.authorName}</div>
+                  <h3 className="text-sm font-bold tracking-tight text-slate-900 mt-0.5 leading-tight line-clamp-2">
+                    {idea.title}
+                  </h3>
+                  <div className="mt-2 flex items-center gap-3 text-[11px] text-muted">
+                    <span className="inline-flex items-center gap-0.5">
+                      <Star size={11} className="text-primary" />
+                      {idea.rating}
+                    </span>
+                    <span className="inline-flex items-center gap-0.5">
+                      <MessageSquare size={11} />
+                      {idea.commentsCount}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
+
+          {/* 추가 카드 */}
+          <button
+            onClick={() => navigate('/prototype/idea/new')}
+            className="aspect-square border-2 border-dashed border-border rounded-2xl flex flex-col items-center justify-center text-muted hover:border-primary/40 hover:text-primary-dark transition-colors"
+          >
+            <Plus size={24} />
+            <span className="text-xs font-semibold mt-1.5">아이디어 추가</span>
+          </button>
+        </div>
+      </main>
+
+      {/* 하단 CTA */}
+      <div className="fixed bottom-0 left-0 right-0 bg-paper">
+        <div className="max-w-[440px] mx-auto px-5 pb-6 pt-3">
+          <Button
+            variant="primary"
+            fullWidth
+            size="lg"
+            onClick={() => navigate('/prototype/vote')}
+          >
+            투표하러 가기
+          </Button>
+        </div>
       </div>
-    </PrototypeLayout>
+    </div>
   );
 }
