@@ -26,7 +26,7 @@ export default function Landing() {
 
       {/* 중앙 로고 영역 — 파도가 좌→우로 흘러 들어오는 진입 애니메이션 */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <WeaveMark className="landing-mark w-20 h-auto text-white" />
+        <WeaveMark animated className="w-20 h-auto text-white" />
         <h1 className="landing-label mt-4 text-[32px] font-bold tracking-tight text-white">
           Weave
         </h1>
