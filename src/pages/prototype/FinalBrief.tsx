@@ -1,7 +1,8 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Folder, Heart, MessageSquare, Vote } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
+import { Lightbox } from '../../components/ui/Lightbox';
 import { ideas } from '../../prototype/data';
 
 /**
@@ -16,6 +17,7 @@ import { ideas } from '../../prototype/data';
 
 export default function FinalBrief() {
   const navigate = useNavigate();
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
   // 1위 아이디어가 있으면 그걸, 없으면 i1 기본
   const winner = useMemo(() => {
@@ -68,8 +70,8 @@ export default function FinalBrief() {
           </h2>
 
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <PdfThumb src={winner.image ?? '/ideas/i1.jpg'} />
-            <PdfThumb src="/ideas/i2.jpg" />
+            <PdfThumb src={winner.image ?? '/ideas/i1.jpg'} onClick={setLightboxSrc} />
+            <PdfThumb src="/ideas/i2.jpg" onClick={setLightboxSrc} />
           </div>
 
           {/* 메타 */}
@@ -137,6 +139,10 @@ export default function FinalBrief() {
           </div>
         </section>
       </main>
+
+      {lightboxSrc && (
+        <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+      )}
     </div>
   );
 }
@@ -163,11 +169,16 @@ function BulletList({ items }: { items: string[] }) {
   );
 }
 
-function PdfThumb({ src }: { src: string }) {
+function PdfThumb({ src, onClick }: { src: string; onClick: (src: string) => void }) {
   return (
-    <div className="aspect-[3/4] rounded-xl overflow-hidden border border-border bg-surface-alt">
+    <button
+      type="button"
+      onClick={() => onClick(src)}
+      className="aspect-[3/4] rounded-xl overflow-hidden border border-border bg-surface-alt hover:border-primary/40 transition-colors"
+      aria-label="이미지 크게 보기"
+    >
       <img src={src} alt="기획안 미리보기" loading="lazy" className="w-full h-full object-cover object-top" />
-    </div>
+    </button>
   );
 }
 

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, MessageSquare, Pencil, X } from 'lucide-react';
+import { ArrowLeft, Heart, MessageSquare, Pencil } from 'lucide-react';
 import { ideas, type Comment } from '../../prototype/data';
 import { Avatar } from '../../components/ui/Avatar';
+import { Lightbox } from '../../components/ui/Lightbox';
 
 /**
  * 아이디어 상세 (Figma "아이디어 상세.png" / "아이디어 상세-1.png").
@@ -238,30 +239,6 @@ function CommentSheet({ comments, authorName, onClose }: CommentSheetProps) {
           />
         </div>
       </div>
-    </div>
-  );
-}
-
-function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 bg-slate-900/90 sheet-backdrop-enter flex items-center justify-center p-6">
-      <button
-        onClick={onClose}
-        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
-        aria-label="닫기"
-      >
-        <X size={20} />
-      </button>
-      <button
-        onClick={onClose}
-        className="absolute inset-0"
-        aria-label="배경 클릭으로 닫기"
-      />
-      <img
-        src={src}
-        alt="확대 보기"
-        className="lightbox-enter relative max-w-full max-h-full object-contain rounded-xl"
-      />
     </div>
   );
 }
