@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Folder, Users, Check, Minus, Plus } from 'lucide-react';
+import { ArrowLeft, Folder, Users, Check, Minus, Plus, CalendarDays } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '../../components/ui/Button';
 import { ProgressBar } from '../../components/ui/ProgressBar';
@@ -116,6 +116,7 @@ export default function Onboarding() {
               onChange={(v) => set('deadline', v)}
               placeholder="예: 2026. 05. 18 (월)  15:00"
             />
+            <AutoSchedulePreview deadline={state.deadline} />
           </StepWrap>
         )}
 
@@ -273,6 +274,64 @@ function RadioCards({
       })}
     </div>
   );
+}
+
+/**
+ * 마감일을 받아 자동 단계 일정을 미리 보여주는 카드.
+ * 시연용 — 마감일 텍스트 "2026. 05. 18 (월)" 같은 형식이면 그대로 표기,
+ * 그 외엔 정적 예시 사용.
+ */
+function AutoSchedulePreview({ deadline }: { deadline: string }) {
+  // 데드라인 텍스트에서 yyyy. mm. dd 만 추출 → Date 변환 시도
+  const match = deadline.match(/(\d{4})\.\s*(\d{1,2})\.\s*(\d{1,2})/);
+  let end: Date | null = null;
+  if (match) {
+    const [, y, m, d] = match;
+    const parsed = new Date(Number(y), Number(m) - 1, Number(d));
+    if (!isNaN(parsed.getTime())) end = parsed;
+  }
+
+  const stages = [
+    { label: '아이디어 제출', offset: -3 },
+    { label: '피드백', offset: -2 },
+    { label: '투표', offset: -1 },
+    { label: '최종 마감', offset: 0 },
+  ];
+
+  return (
+    <div className="mt-4 bg-accent-soft rounded-2xl p-4">
+      <div className="flex items-center gap-2 text-xs font-bold text-primary-dark mb-3">
+        <CalendarDays size={14} className="text-primary" />
+        자동 계산된 일정
+      </div>
+      <ul className="space-y-2">
+        {stages.map((s) => {
+          const date = end ? offsetDate(end, s.offset) : null;
+          return (
+            <li
+              key={s.label}
+              className="flex items-center justify-between text-sm"
+            >
+              <span className="text-slate-900">{s.label}</span>
+              <span className="text-muted">
+                {date ? formatKo(date) : '—'}
+              </span>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function offsetDate(base: Date, days: number): Date {
+  const d = new Date(base);
+  d.setDate(d.getDate() + days);
+  return d;
+}
+function formatKo(d: Date): string {
+  const yoil = ['일', '월', '화', '수', '목', '금', '토'][d.getDay()];
+  return `${d.getFullYear()}. ${String(d.getMonth() + 1).padStart(2, '0')}. ${String(d.getDate()).padStart(2, '0')} (${yoil})`;
 }
 
 function NumberStepper({

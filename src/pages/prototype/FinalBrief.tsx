@@ -125,12 +125,12 @@ export default function FinalBrief() {
 
           <div className="mt-3 grid grid-cols-2 gap-3">
             <ExportCard
-              icon={<DocxGlyph />}
+              icon={<img src="/doc.png" alt="" className="w-7 h-7" />}
               label="Docx"
               onClick={() => {/* mock */}}
             />
             <ExportCard
-              icon={<CanvaGlyph />}
+              icon={<img src="/canva.png" alt="" className="w-7 h-7" />}
               label="Canva"
               onClick={() => {/* mock */}}
             />
@@ -185,38 +185,6 @@ function ExportCard({ icon, label, onClick }: ExportCardProps) {
       <span className="flex-shrink-0">{icon}</span>
       <span className="text-sm font-semibold text-slate-900">{label}</span>
     </button>
-  );
-}
-
-function DocxGlyph() {
-  // Word 풍 블루 도큐먼트 글리프
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="3" width="18" height="18" rx="3" fill="#2B579A" />
-      <text x="12" y="16" textAnchor="middle" fontFamily="Arial Black, sans-serif" fontSize="9" fontWeight="900" fill="#FFFFFF">W</text>
-    </svg>
-  );
-}
-
-function CanvaGlyph() {
-  // Canva 브랜드 원형 글리프 — purple → cyan 그라데이션 원 + 흰 'C'
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id="canva-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#7B61FF" />
-          <stop offset="100%" stopColor="#00C4CC" />
-        </linearGradient>
-      </defs>
-      <circle cx="12" cy="12" r="10" fill="url(#canva-grad)" />
-      <path
-        d="M15.2 9.5c-.5-.9-1.5-1.5-2.7-1.5-2.2 0-3.8 1.9-3.8 4.1 0 2.2 1.5 4 3.7 4 1.4 0 2.5-.7 3-1.8"
-        stroke="white"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        fill="none"
-      />
-    </svg>
   );
 }
 

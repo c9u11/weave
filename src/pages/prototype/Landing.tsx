@@ -70,22 +70,21 @@ export default function Landing() {
 }
 
 /**
- * 카카오 로그인 공식 심볼 (말풍선).
+ * 카카오 공식 로그인 심볼 (말풍선).
  * 가이드: https://developers.kakao.com/docs/latest/ko/kakaologin/design-guide
- * - rounded-square 본체 + 우측 하단 tail
- * - fill: #181600 (텍스트 컬러와 동일, 85% black 효과)
+ * 비율 18×17, 우측 하단 tail (꼬리) 가 짧게 내려옴.
  */
 function KakaoGlyph() {
   return (
     <svg
       width="18"
-      height="18"
-      viewBox="0 0 24 24"
+      height="17"
+      viewBox="0 0 18 17"
       xmlns="http://www.w3.org/2000/svg"
       fill="currentColor"
       aria-hidden
     >
-      <path d="M12 3C6.48 3 2 6.58 2 10.99c0 2.84 1.86 5.33 4.65 6.77-.2.74-.74 2.74-.85 3.17-.13.55.2.55.42.4.18-.12 2.84-1.93 3.99-2.72.59.09 1.18.13 1.79.13 5.52 0 10-3.58 10-7.75C22 6.58 17.52 3 12 3z" />
+      <path d="M9 0C4.03 0 0 3.13 0 7c0 2.49 1.65 4.68 4.13 5.93-.18.66-.66 2.41-.76 2.78-.12.46.17.46.36.33.15-.1 2.39-1.62 3.36-2.27.62.09 1.26.13 1.91.13 4.97 0 9-3.13 9-7C18 3.13 13.97 0 9 0z" />
     </svg>
   );
 }

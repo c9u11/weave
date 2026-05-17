@@ -17,8 +17,14 @@ export default function OnboardingReady() {
     <div
       className="relative min-h-screen flex flex-col"
       style={{
-        background:
-          'radial-gradient(120% 80% at 50% 0%, #E8EBF7 0%, #F6F7FB 55%, #FFFFFF 100%)',
+        background: [
+          // 중앙 칩 영역의 옅은 primary 글로우
+          'radial-gradient(70% 45% at 50% 60%, rgba(134, 148, 223, 0.35) 0%, rgba(232, 235, 247, 0.6) 40%, rgba(255,255,255,0) 75%)',
+          // 상단의 미세한 보랏빛 hint
+          'radial-gradient(90% 50% at 50% 0%, rgba(213, 221, 242, 0.7) 0%, rgba(255, 255, 255, 0) 60%)',
+          // 베이스
+          'linear-gradient(180deg, #FFFFFF 0%, #F6F7FB 100%)',
+        ].join(', '),
       }}
     >
       <Link

@@ -146,14 +146,11 @@
     animation: splash-fade-in 600ms ease-out 950ms forwards;
   }
 
-  /* ============= Landing 진입 (좌 → 우 파도 흐름) ============= */
-  /* 1) 로고가 좌측에서 파도처럼 흘러 들어옴
-     2) "Weave" 워드마크 페이드 인
-     3) 하단 버튼들 순차 슬라이드 업 */
+  /* ============= Landing 진입 (좌 → 우 단순 reveal) ============= */
+  /* clip-path 로 좌에서 우로 wipe — 로고가 그려지듯 드러남 */
   .landing-mark {
-    opacity: 0;
-    transform: translateX(-48px);
-    animation: landing-wave-in 900ms cubic-bezier(0.22, 0.61, 0.36, 1) 200ms forwards;
+    clip-path: inset(0 100% 0 0);
+    animation: landing-reveal 800ms ease-out 200ms forwards;
   }
   .landing-label {
     opacity: 0;
@@ -180,12 +177,10 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* 파도가 좌측에서 흘러 들어오는 듯한 진입 — translateX + 가벼운 sinusoidal y */
-@keyframes landing-wave-in {
-  0%   { opacity: 0; transform: translateX(-48px) translateY(0); }
-  40%  { opacity: 1; transform: translateX(-12px) translateY(-4px); }
-  70%  { transform: translateX(-2px)  translateY(2px); }
-  100% { opacity: 1; transform: translateX(0)    translateY(0); }
+/* 좌→우 horizontal wipe — 로고가 그려지듯이 드러남 */
+@keyframes landing-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to   { clip-path: inset(0 0    0 0); }
 }
 
 /* 바텀시트 슬라이드 업 / 다운 */

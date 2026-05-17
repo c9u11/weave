@@ -96,7 +96,7 @@ export default function PlanSelect() {
                     {p.price && (
                       <span
                         className={`text-base font-semibold ${
-                          isSelected ? 'text-slate-900' : 'text-primary'
+                          isSelected ? 'text-primary' : 'text-slate-900'
                         }`}
                       >
                         {p.price}
