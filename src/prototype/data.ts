@@ -66,13 +66,13 @@ export interface Idea {
   };
   personas: PersonaCritique[];
   comments: Comment[];
-  rating: number;
+  likes: number;
   commentsCount: number;
 }
 
 export interface NotificationItem {
   id: string;
-  type: 'comment' | 'ai' | 'rating' | 'member' | 'deadline';
+  type: 'comment' | 'ai' | 'like' | 'member' | 'deadline';
   text: string;
   time: string;
   unread: boolean;
@@ -285,7 +285,7 @@ export const ideas: Idea[] = [
         time: '20분 전',
       },
     ],
-    rating: 4.0,
+    likes: 7,
     commentsCount: 4,
   },
   {
@@ -320,7 +320,7 @@ export const ideas: Idea[] = [
         time: '12분 전',
       },
     ],
-    rating: 3.6,
+    likes: 5,
     commentsCount: 2,
   },
   {
@@ -346,7 +346,7 @@ export const ideas: Idea[] = [
     },
     personas: personaTemplates,
     comments: [],
-    rating: 4.1,
+    likes: 8,
     commentsCount: 3,
   },
   {
@@ -371,7 +371,7 @@ export const ideas: Idea[] = [
     },
     personas: personaTemplates,
     comments: [],
-    rating: 3.5,
+    likes: 4,
     commentsCount: 2,
   },
   {
@@ -407,7 +407,7 @@ export const ideas: Idea[] = [
         time: '5분 전',
       },
     ],
-    rating: 3.9,
+    likes: 6,
     commentsCount: 3,
   },
   {
@@ -450,7 +450,7 @@ export const ideas: Idea[] = [
         time: '14분 전',
       },
     ],
-    rating: 4.3,
+    likes: 9,
     commentsCount: 5,
   },
   {
@@ -475,7 +475,7 @@ export const ideas: Idea[] = [
     },
     personas: personaTemplates,
     comments: [],
-    rating: 3.3,
+    likes: 3,
     commentsCount: 2,
   },
   {
@@ -556,7 +556,7 @@ export const ideas: Idea[] = [
         time: '18분 전',
       },
     ],
-    rating: 4.6,
+    likes: 12,
     commentsCount: 8,
   },
 ];
@@ -580,8 +580,8 @@ export const notifications: NotificationItem[] = [
   },
   {
     id: 'n3',
-    type: 'rating',
-    text: '희진님이 내 아이디어에 별점 4.0을 매겼어요',
+    type: 'like',
+    text: '희진님이 내 아이디어에 좋아요를 눌렀어요',
     time: '12분 전',
     unread: true,
   },
@@ -714,14 +714,13 @@ export const screenList = [
   { num: '05', path: '/prototype/invite', name: '팀원 초대', desc: '초대 링크 + 카톡 공유 + 대기 슬롯' },
   { num: '06', path: '/prototype/join', name: '초대 합류', desc: '초대 링크 진입 — 팀 정보 + 합류 CTA' },
   { num: '07', path: '/prototype/team', name: '홈', desc: '사용자 + 프로젝트 카드 + 4-step + 아이디어 그리드', star: true },
-  { num: '08', path: '/prototype/idea/new', name: '아이디어 작성', desc: '두서없이 textarea → AI 정리' },
+  { num: '08', path: '/prototype/idea/new', name: '아이디어 작성', desc: '5필드 입력 (IdeaEdit 신규 모드)' },
   { num: '09', path: '/prototype/ideas', name: '아이디어 목록', desc: '2열 카드 그리드 + 정렬 칩' },
   { num: '10', path: '/prototype/idea/i1', name: '아이디어 상세', desc: '갤러리 + 5섹션 + 댓글 BottomSheet', star: true },
-  { num: '11', path: '/prototype/idea/i1/edit', name: '아이디어 수정', desc: '원문 + AI 재정리 + 5필드' },
+  { num: '11', path: '/prototype/idea/i1/edit', name: '아이디어 수정', desc: '5필드 — 기존 데이터 미리 채움' },
   { num: '12', path: '/prototype/vote', name: '투표 진행', desc: '두 카드 스택 1v1 + 진행바', star: true },
   { num: '13', path: '/prototype/vote/result', name: '투표 결과', desc: '1위 hero + 2·3위 + 나머지' },
-  { num: '14', path: '/prototype/mediate', name: 'AI 충돌 중재', desc: '합의 / 충돌 분리 + AI 제안' },
-  { num: '15', path: '/prototype/brief', name: '최종 기획안 확인', desc: 'PDF 미리보기 + Docx / Canva', star: true },
-  { num: '16', path: '/prototype/chat', name: 'AI 채팅', desc: '1:1 AI 대화 — 사용자 버블 / AI 본문' },
-  { num: '17', path: '/prototype/notifications', name: '알림', desc: '필터 + 알림 카드 리스트' },
+  { num: '14', path: '/prototype/brief', name: '최종 기획안 확인', desc: 'PDF 미리보기 + Docx / Canva', star: true },
+  { num: '15', path: '/prototype/chat', name: 'AI 채팅', desc: '1:1 AI 대화 — 사용자 버블 / AI 본문' },
+  { num: '16', path: '/prototype/notifications', name: '알림', desc: '필터 + 알림 카드 리스트' },
 ];

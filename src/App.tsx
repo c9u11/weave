@@ -15,12 +15,10 @@ import PlanSelect from './pages/prototype/PlanSelect';
 import Invite from './pages/prototype/Invite';
 import Join from './pages/prototype/Join';
 import TeamHome from './pages/prototype/TeamHome';
-import IdeaNew from './pages/prototype/IdeaNew';
 import IdeasBoard from './pages/prototype/IdeasBoard';
 import IdeaDetail from './pages/prototype/IdeaDetail';
 import Vote from './pages/prototype/Vote';
 import VoteResult from './pages/prototype/VoteResult';
-import Mediate from './pages/prototype/Mediate';
 import FinalBrief from './pages/prototype/FinalBrief';
 import Notifications from './pages/prototype/Notifications';
 import IdeaEdit from './pages/prototype/IdeaEdit';
@@ -46,13 +44,12 @@ function App() {
         <Route path="/prototype/invite" element={<Invite />} />
         <Route path="/prototype/join" element={<Join />} />
         <Route path="/prototype/team" element={<TeamHome />} />
-        <Route path="/prototype/idea/new" element={<IdeaNew />} />
+        <Route path="/prototype/idea/new" element={<IdeaEdit />} />
         <Route path="/prototype/ideas" element={<IdeasBoard />} />
         <Route path="/prototype/idea/:id/edit" element={<IdeaEdit />} />
         <Route path="/prototype/idea/:id" element={<IdeaDetail />} />
         <Route path="/prototype/vote/result" element={<VoteResult />} />
         <Route path="/prototype/vote" element={<Vote />} />
-        <Route path="/prototype/mediate" element={<Mediate />} />
         <Route path="/prototype/brief" element={<FinalBrief />} />
         <Route path="/prototype/chat" element={<Chat />} />
         <Route path="/prototype/notifications" element={<Notifications />} />

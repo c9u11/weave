@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { ArrowLeft, MessageSquare, Bot, Star, Users, Clock, CheckCheck } from 'lucide-react';
+import { ArrowLeft, MessageSquare, Bot, Heart, Users, Clock, CheckCheck } from 'lucide-react';
 import { notifications } from '../../prototype/data';
 
 /**
@@ -13,7 +13,7 @@ import { notifications } from '../../prototype/data';
 const iconByType = {
   comment: MessageSquare,
   ai: Bot,
-  rating: Star,
+  like: Heart,
   member: Users,
   deadline: Clock,
 } as const;
@@ -21,7 +21,7 @@ const iconByType = {
 const colorByType = {
   comment: '#A78BFA',
   ai: '#566CCC',
-  rating: '#FB923C',
+  like: '#F472B6',
   member: '#34D399',
   deadline: '#F87171',
 } as const;

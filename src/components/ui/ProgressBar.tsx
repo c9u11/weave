@@ -16,8 +16,8 @@ export function ProgressBar({ value, className = '' }: ProgressBarProps) {
       aria-valuemax={100}
     >
       <div
-        className="h-full bg-primary rounded-full transition-[width] duration-300 ease-out"
-        style={{ width: `${pct}%` }}
+        className="h-full bg-primary transition-[width] duration-300 ease-out"
+        style={{ width: `${pct}%`, backgroundColor: '#566CCC' }}
       />
     </div>
   );

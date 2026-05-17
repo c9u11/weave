@@ -34,7 +34,7 @@ export default function VoteResult() {
     }
     const scored = ideas.map((i) => ({
       idea: i,
-      score: (wins[i.id] ?? 0) * 10 + i.rating,
+      score: (wins[i.id] ?? 0) * 10 + i.likes,
     }));
     scored.sort((a, b) => b.score - a.score);
     return scored.map((x, idx) => ({ idea: x.idea, rank: idx + 1 }));

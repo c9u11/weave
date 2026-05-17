@@ -68,7 +68,7 @@ export default function PlanSelect() {
 
         <ProgressBar value={0.95} className="mt-4" />
 
-        <h1 className="mt-8 text-[26px] font-bold tracking-tight text-slate-900">
+        <h1 className="mt-8 text-[22px] font-bold tracking-tight text-slate-900">
           팀 플랜 선택
         </h1>
         <p className="mt-2 text-sm text-muted">

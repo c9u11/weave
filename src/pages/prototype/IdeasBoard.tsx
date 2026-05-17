@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom';
 import { useMemo, useState } from 'react';
-import { ArrowLeft, Plus, Star, MessageSquare, Clock } from 'lucide-react';
+import { ArrowLeft, Plus, Heart, MessageSquare, Clock } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { ideas as baseIdeas } from '../../prototype/data';
 
@@ -12,9 +12,9 @@ import { ideas as baseIdeas } from '../../prototype/data';
  * - 하단 CTA: 투표로 이동
  */
 
-type SortKey = 'rating' | 'comments' | 'recent';
-const SORTS: { key: SortKey; label: string; icon: typeof Star }[] = [
-  { key: 'rating', label: '별점순', icon: Star },
+type SortKey = 'likes' | 'comments' | 'recent';
+const SORTS: { key: SortKey; label: string; icon: typeof Heart }[] = [
+  { key: 'likes', label: '좋아요 순', icon: Heart },
   { key: 'comments', label: '댓글 많은', icon: MessageSquare },
   { key: 'recent', label: '최신순', icon: Clock },
 ];
@@ -29,13 +29,13 @@ interface DraftIdea {
   gradient: string;
   image?: string;
   rawText: string;
-  rating: number;
+  likes: number;
   commentsCount: number;
 }
 
 export default function IdeasBoard() {
   const navigate = useNavigate();
-  const [sort, setSort] = useState<SortKey>('rating');
+  const [sort, setSort] = useState<SortKey>('likes');
 
   const newIdeas = useMemo<DraftIdea[]>(() => {
     if (typeof window === 'undefined') return [];
@@ -49,7 +49,7 @@ export default function IdeasBoard() {
   const allIdeas = useMemo(() => {
     const merged = [...baseIdeas, ...newIdeas];
     const sorted = [...merged];
-    if (sort === 'rating') sorted.sort((a, b) => b.rating - a.rating);
+    if (sort === 'likes') sorted.sort((a, b) => b.likes - a.likes);
     else if (sort === 'comments') sorted.sort((a, b) => b.commentsCount - a.commentsCount);
     else {
       sorted.sort((a, b) => {
@@ -148,8 +148,8 @@ export default function IdeasBoard() {
                   </h3>
                   <div className="mt-2 flex items-center gap-3 text-[11px] text-muted">
                     <span className="inline-flex items-center gap-0.5">
-                      <Star size={11} className="text-primary" />
-                      {idea.rating}
+                      <Heart size={11} className="text-primary" />
+                      {idea.likes}
                     </span>
                     <span className="inline-flex items-center gap-0.5">
                       <MessageSquare size={11} />

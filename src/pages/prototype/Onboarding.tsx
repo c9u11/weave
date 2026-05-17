@@ -32,7 +32,7 @@ export default function Onboarding() {
         <ProgressBar value={0.5} className="mt-4" />
 
         {/* 타이틀 */}
-        <h1 className="mt-8 text-[26px] font-bold tracking-tight text-slate-900">
+        <h1 className="mt-8 text-[22px] font-bold tracking-tight text-slate-900">
           프로젝트 세부 설정
         </h1>
         <p className="mt-2 text-sm text-muted">

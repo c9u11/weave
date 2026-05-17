@@ -65,7 +65,7 @@ export default function Vote() {
           <ArrowLeft size={24} />
         </button>
 
-        <h1 className="mt-3 text-[26px] font-bold tracking-tight text-slate-900">
+        <h1 className="mt-3 text-[22px] font-bold tracking-tight text-slate-900">
           투표 진행
         </h1>
         <p className="mt-2 text-sm text-muted">
