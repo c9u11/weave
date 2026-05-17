@@ -136,68 +136,24 @@
   }
 
   /* ============= Splash animation ============= */
-  /* "0(좌측 상단) → W 그리기 → 1(우측 상단) 튀어오름" */
+  /* 윙·웨이브 마크가 살짝 솟아 오르며 자리에 박힘 → 워드마크 페이드 업 */
 
-  .splash-zero {
+  .splash-mark {
     opacity: 0;
-    transform-box: fill-box;
     transform-origin: center;
-    /* 1 과 동일한 back-out easing — 오버슈트(=tap)는 easing 이 자연스럽게 만들어줌 */
-    animation: splash-zero-fall 600ms cubic-bezier(0.34, 1.56, 0.64, 1) 300ms forwards;
-  }
-
-  /* W 본체는 mask로 가려두고, W의 중심선을 따라가는 두꺼운 stroke를
-     stroke-dashoffset 으로 풀어내며 "써내려가듯" 드러냄.
-     - 그룹 자체는 draw 시작 전까지 opacity:0 — dash 경계의 round cap 잔상 차단 */
-  .splash-w-group {
-    opacity: 0;
-    animation: splash-w-appear 1ms linear 700ms forwards;
-  }
-
-  .splash-w-draw {
-    /* dasharray "1 100" — 단 하나의 dash 만 두고 다음 dash 는 path 밖으로 멀리 밀어냄.
-       기본값 "1" 은 dash/gap 반복이라 2번째 dash 의 round-cap 이 우측 끝(path pos 1)에 잔상 남김 */
-    stroke-dasharray: 1 100;
-    stroke-dashoffset: 1;
-    animation: splash-w-draw 1300ms cubic-bezier(0.65, 0, 0.35, 1) 700ms forwards;
-  }
-
-  .splash-one {
-    opacity: 0;
-    transform-box: fill-box;
-    transform-origin: center;
-    animation: splash-one-rise 550ms cubic-bezier(0.34, 1.56, 0.64, 1) 1700ms forwards;
+    animation: splash-mark-rise 850ms cubic-bezier(0.34, 1.56, 0.64, 1) 200ms forwards;
   }
 
   .splash-label {
     opacity: 0;
-    animation: splash-fade-in 600ms ease-out 2500ms forwards;
+    animation: splash-fade-in 600ms ease-out 950ms forwards;
   }
 }
 
-/* 키프레임은 layer 밖 */
-/* 0 — 위에서 떨어져 W 시작 지점을 톡 두드림.
-   1 과 같은 3단계 구조의 거울상: 멀리서 등장 → 자리를 넘어 톡 박힘 → 제자리.
-   55% 시점이 임팩트 = 절대 630ms (W draw 는 700ms 에 시작) */
-@keyframes splash-zero-fall {
-  0%   { transform: translateY(-36px); opacity: 0; }
-  55%  { transform: translateY(8px);   opacity: 1; }  /* TAP — 1 의 -4px 거울상, 깊게 박혀 톡 */
-  100% { transform: translateY(0);     opacity: 1; }
-}
-
-@keyframes splash-w-draw {
-  to { stroke-dashoffset: 0; }
-}
-
-@keyframes splash-w-appear {
-  to { opacity: 1; }
-}
-
-/* 1 은 아래에서 위로 — W의 끝이 "쳐 올린" 느낌 */
-@keyframes splash-one-rise {
-  0%   { transform: translateY(22px); opacity: 0; }
-  55%  { transform: translateY(-4px); opacity: 1; }
-  100% { transform: translateY(0);    opacity: 1; }
+@keyframes splash-mark-rise {
+  0%   { opacity: 0; transform: translateY(14px) scale(0.85); }
+  60%  { opacity: 1; transform: translateY(-3px) scale(1.02); }
+  100% { opacity: 1; transform: translateY(0)    scale(1); }
 }
 
 @keyframes splash-fade-in {
