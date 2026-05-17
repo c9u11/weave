@@ -1,17 +1,35 @@
+import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Folder, FileText, Heart, MessageSquare, Vote } from 'lucide-react';
+import { ArrowLeft, Folder, Heart, MessageSquare, Vote } from 'lucide-react';
 import { Avatar } from '../../components/ui/Avatar';
+import { ideas } from '../../prototype/data';
 
 /**
  * 최종 기획안 확인 (Figma "최종 기획안 확인.png").
- * - 상단 정보 카드 (accent-soft): "기획안이 완성 되었어요!" + 안내
- * - 기획안 미리 보기: 2 PDF 썸네일 + 타이틀 / 메타 / 메트릭 칩 3개
- * - 내보내기: 2개 데스티네이션 카드 (Docx / Connect to Canva)
+ * - 완료 안내 카드 (accent-soft)
+ * - 기획안 미리 보기: PDF 썸네일 + 타이틀 / 메타 / 메트릭
+ * - 기획안 본문 5섹션 (문제 정의 / 핵심 기능 / 타깃 / 차별점 / 리스크)
+ * - 내보내기: Docx / Canva 카드
  *
- * 흐름의 종착 화면이라 다음 단계는 없고, 뒤로 / 내보내기로 빠져나간다.
+ * 흐름의 종착 — 다음 단계 없음, 내보내기/뒤로로 빠져나감.
  */
+
 export default function FinalBrief() {
   const navigate = useNavigate();
+
+  // 1위 아이디어가 있으면 그걸, 없으면 i1 기본
+  const winner = useMemo(() => {
+    if (typeof window !== 'undefined') {
+      const id = sessionStorage.getItem('weave:winnerIdeaId');
+      if (id) return ideas.find((i) => i.id === id) ?? ideas[0];
+    }
+    return ideas[0];
+  }, []);
+
+  const featureBullets = splitBullets(winner.organized.feature);
+  const targetBullets = splitBullets(winner.organized.target);
+  const differentiatorBullets = splitBullets(winner.organized.differentiator);
+  const riskBullets = splitBullets(winner.organized.risk);
 
   return (
     <div className="min-h-screen bg-paper">
@@ -28,7 +46,7 @@ export default function FinalBrief() {
           최종 기획안 확인
         </h1>
 
-        {/* 완료 안내 카드 */}
+        {/* 완료 안내 */}
         <div className="mt-5 bg-accent-soft rounded-2xl p-5">
           <div className="flex items-start gap-3">
             <Folder size={22} className="text-primary flex-shrink-0 mt-0.5" fill="currentColor" />
@@ -37,26 +55,27 @@ export default function FinalBrief() {
                 기획안이 완성 되었어요!
               </h2>
               <p className="mt-1 text-xs text-muted leading-relaxed">
-                아래 내용을 확인하고 AI에게 팀과 공유해보세요
+                아래 내용을 확인하고 팀과 공유해보세요
               </p>
             </div>
           </div>
         </div>
 
-        {/* 기획안 미리 보기 */}
+        {/* 미리 보기 썸네일 */}
         <section className="mt-6">
           <h2 className="text-base font-bold tracking-tight text-slate-900">
             기획안 미리 보기
           </h2>
 
           <div className="mt-3 grid grid-cols-2 gap-3">
-            <PdfThumb src="/ideas/i1.jpg" />
+            <PdfThumb src={winner.image ?? '/ideas/i1.jpg'} />
             <PdfThumb src="/ideas/i2.jpg" />
           </div>
 
+          {/* 메타 */}
           <div className="mt-4">
             <h3 className="text-base font-semibold text-slate-900">
-              AI 아이디어 정리 서비스
+              {winner.title}
             </h3>
             <p className="mt-1 text-xs text-muted">
               하루 전 · 2025-05-15 14:30
@@ -68,10 +87,10 @@ export default function FinalBrief() {
               </div>
               <div className="flex items-center gap-3 text-xs text-muted ml-auto">
                 <span className="inline-flex items-center gap-1">
-                  <Heart size={14} /> 6
+                  <Heart size={14} /> {winner.likes}
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <MessageSquare size={14} /> 6
+                  <MessageSquare size={14} /> {winner.commentsCount}
                 </span>
                 <span className="inline-flex items-center gap-1">
                   <Vote size={14} /> 5
@@ -79,40 +98,68 @@ export default function FinalBrief() {
               </div>
             </div>
           </div>
-
-          {/* 핵심 내용 */}
-          <div className="mt-5 bg-accent-soft rounded-2xl p-5">
-            <h3 className="text-sm font-bold text-slate-900">핵심 내용</h3>
-            <p className="mt-2 text-xs text-slate-900 leading-relaxed">
-              회의 중 흩어진 아이디어들을 AI가 자동으로 정리하고 핵심을 빠르게 구조화해주는 서비스입니다.
-              팀원 피드백·투표와 PDF 자동 형식 기획안 출력으로 완성도를 높일 수 있어요.
-            </p>
-          </div>
         </section>
 
+        {/* 기획안 본문 — IdeaDetail 과 같은 구조 */}
+        <Section title="아이디어 설명">
+          <p className="text-sm text-slate-900 leading-7">{winner.organized.problem}</p>
+        </Section>
+        <Section title="핵심 기능">
+          <BulletList items={featureBullets} />
+        </Section>
+        <Section title="타깃">
+          <BulletList items={targetBullets} />
+        </Section>
+        <Section title="차별점">
+          <BulletList items={differentiatorBullets} />
+        </Section>
+        <Section title="리스크">
+          <BulletList items={riskBullets} />
+        </Section>
+
         {/* 내보내기 */}
-        <section className="mt-7">
+        <section className="mt-8">
           <h2 className="text-base font-bold tracking-tight text-slate-900">
             내보내기
           </h2>
 
           <div className="mt-3 grid grid-cols-2 gap-3">
             <ExportCard
-              icon={<FileText size={28} className="text-primary" />}
+              icon={<DocxGlyph />}
               label="Docx"
-              tone="default"
               onClick={() => {/* mock */}}
             />
             <ExportCard
               icon={<CanvaGlyph />}
-              label="Connect to Canva"
-              tone="canva"
+              label="Canva"
               onClick={() => {/* mock */}}
             />
           </div>
         </section>
       </main>
     </div>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="mt-7">
+      <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2>
+      <div className="mt-3">{children}</div>
+    </section>
+  );
+}
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-1.5">
+      {items.map((item, idx) => (
+        <li key={idx} className="text-sm text-slate-900 leading-7 flex gap-2">
+          <span className="text-muted flex-shrink-0">·</span>
+          <span className="flex-1">{item}</span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -127,32 +174,52 @@ function PdfThumb({ src }: { src: string }) {
 interface ExportCardProps {
   icon: React.ReactNode;
   label: string;
-  tone: 'default' | 'canva';
   onClick: () => void;
 }
-function ExportCard({ icon, label, tone, onClick }: ExportCardProps) {
-  const isCanva = tone === 'canva';
+function ExportCard({ icon, label, onClick }: ExportCardProps) {
   return (
     <button
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-4 rounded-2xl border transition-colors text-left ${
-        isCanva
-          ? 'bg-gradient-to-r from-[#7B61FF] to-[#00C4CC] text-white border-transparent hover:opacity-90'
-          : 'bg-white border-border text-slate-900 hover:border-primary/40'
-      }`}
+      className="flex items-center gap-3 px-4 py-4 rounded-2xl bg-white border border-border hover:border-primary/40 transition-colors text-left"
     >
-      <span className={isCanva ? 'text-white' : ''}>{icon}</span>
-      <span className="text-sm font-semibold">{label}</span>
+      <span className="flex-shrink-0">{icon}</span>
+      <span className="text-sm font-semibold text-slate-900">{label}</span>
     </button>
   );
 }
 
-function CanvaGlyph() {
-  // Canva 의 단순화한 원형 글리프
+function DocxGlyph() {
+  // Word 풍 블루 도큐먼트 글리프
   return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2" />
-      <path d="M9 12c0-2 1.5-3.5 3.5-3.5 1.4 0 2.5.8 2.9 2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="3" y="3" width="18" height="18" rx="3" fill="#2B579A" />
+      <text x="12" y="16" textAnchor="middle" fontFamily="Arial Black, sans-serif" fontSize="9" fontWeight="900" fill="#FFFFFF">W</text>
     </svg>
   );
+}
+
+function CanvaGlyph() {
+  // Canva 브랜드 원형 글리프 — purple → cyan 그라데이션 원 + 흰 'C'
+  return (
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="canva-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#7B61FF" />
+          <stop offset="100%" stopColor="#00C4CC" />
+        </linearGradient>
+      </defs>
+      <circle cx="12" cy="12" r="10" fill="url(#canva-grad)" />
+      <path
+        d="M15.2 9.5c-.5-.9-1.5-1.5-2.7-1.5-2.2 0-3.8 1.9-3.8 4.1 0 2.2 1.5 4 3.7 4 1.4 0 2.5-.7 3-1.8"
+        stroke="white"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+function splitBullets(text: string): string[] {
+  return text.split(/\s*\/\s*/).map((s) => s.trim()).filter(Boolean);
 }
