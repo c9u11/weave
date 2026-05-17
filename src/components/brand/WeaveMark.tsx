@@ -31,7 +31,7 @@ export function WeaveMark({
               d="M 0 30 L 93 30"
               stroke="white"
               strokeWidth="80"
-              strokeLinecap="round"
+              strokeLinecap="butt"
               fill="none"
               pathLength="1"
             />

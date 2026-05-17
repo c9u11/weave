@@ -149,9 +149,10 @@
   /* ============= Landing 진입 (좌 → 우 path 그리기) ============= */
   /* WeaveMark 내부 centerline stroke 의 dashoffset 을 풀어 fill 을 드러냄 */
   .weave-draw {
-    stroke-dasharray: 1;
+    /* dash 1 / gap 100 — 다음 dash 가 path 밖으로 멀리 밀려 round-cap 잔상 없음 */
+    stroke-dasharray: 1 100;
     stroke-dashoffset: 1;
-    animation: weave-path-draw 1300ms cubic-bezier(0.65, 0, 0.35, 1) 200ms forwards;
+    animation: weave-path-draw 800ms cubic-bezier(0.65, 0, 0.35, 1) 150ms forwards;
   }
   .landing-label {
     opacity: 0;

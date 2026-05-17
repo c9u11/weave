@@ -18,10 +18,10 @@ export default function OnboardingReady() {
       className="relative min-h-screen flex flex-col"
       style={{
         background: [
-          // 중앙 글로우를 위로 올림 — 헤딩~칩 상단 위치
-          'radial-gradient(70% 50% at 50% 35%, rgba(134, 148, 223, 0.40) 0%, rgba(232, 235, 247, 0.65) 40%, rgba(255,255,255,0) 75%)',
+          // 칩 클러스터 중앙(=팀 협업 위치) 높이에 글로우 중심
+          'radial-gradient(70% 50% at 50% 50%, rgba(134, 148, 223, 0.40) 0%, rgba(232, 235, 247, 0.65) 40%, rgba(255,255,255,0) 75%)',
           // 상단 보랏빛 hint
-          'radial-gradient(90% 45% at 50% 0%, rgba(213, 221, 242, 0.8) 0%, rgba(255, 255, 255, 0) 55%)',
+          'radial-gradient(90% 35% at 50% 0%, rgba(213, 221, 242, 0.7) 0%, rgba(255, 255, 255, 0) 60%)',
           // 베이스
           'linear-gradient(180deg, #FFFFFF 0%, #F6F7FB 100%)',
         ].join(', '),
