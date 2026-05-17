@@ -706,7 +706,6 @@ export function mockUpdatedAt(ideaId: string): string {
 
 // 화면 리스트 (런처용)
 export const screenList = [
-  { num: '00', path: '/prototype/splash', name: '스플래시', desc: '윙·웨이브 마크 reveal 인트로' },
   { num: '01', path: '/prototype/landing', name: '로그인 (첫 화면)', desc: 'primary 풀-블리드 + 구글 / 카카오', star: true },
   { num: '02', path: '/prototype/onboarding', name: '프로젝트 설정 (01-1)', desc: 'progress 50% + 프로젝트·팀 그룹 카드', star: true },
   { num: '03', path: '/prototype/plan', name: '플랜 선택 (01-2)', desc: 'progress 95% + Free / Plus / Pro', star: true },
