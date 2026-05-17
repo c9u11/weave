@@ -1,257 +1,179 @@
-import { useMemo } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import {
-  ArrowRight, Plus, Clock, Check, CalendarDays,
-  Star, MessageSquare, MessageCircle, Lock,
-} from 'lucide-react';
-import { PrototypeLayout } from '../../prototype/PrototypeLayout';
-import { Avatar } from '../../components/ui/Avatar';
-import { Badge } from '../../components/ui/Badge';
-import {
-  team,
-  members,
-  notifications,
-  ideas,
-  recommendSchedule,
-  toDDay,
-  stageToScheduleKey,
-  getCurrentPlan,
-  isPaidPlan,
-  plans,
-  type ScheduledStage,
-  type ScheduleKey,
-} from '../../prototype/data';
+import { Link } from 'react-router-dom';
+import { Bell, Menu, Sparkles } from 'lucide-react';
+import { Card } from '../../components/ui/Card';
+import { ideas } from '../../prototype/data';
 
-const pathByKey: Record<ScheduleKey, string> = {
-  collect: '/prototype/idea/new',
-  feedback: '/prototype/ideas',
-  vote: '/prototype/vote',
-  wrap: '/prototype/brief',
-};
+/**
+ * 홈 (Figma "홈.png").
+ * - 상단: 사용자 이름 + bell / menu 아이콘
+ * - 프로젝트 카드: 프로젝트 명, 현재 단계, 플랜 배지, D-day, 4-step 프로세스 timeline
+ * - 아이디어 목록: 2열 정사각형 이미지 그리드
+ * - 우하단 primary FAB (✦ AI 채팅 진입)
+ *
+ * 뒤로 경로: 우상단 hamburger → 프로토타입 메뉴 (§0.1)
+ */
 
-const ctaByKey: Record<ScheduleKey, string> = {
-  collect: '아이디어 작성하기',
-  feedback: '피드백 작성하기',
-  vote: '투표하기',
-  wrap: '최종 기획안',
-};
+interface Stage {
+  label: string;
+  to: string;
+}
+
+const STAGES: Stage[] = [
+  { label: '아이디어 제출', to: '/prototype/idea/new' },
+  { label: '피드백', to: '/prototype/ideas' },
+  { label: '투표 진행', to: '/prototype/vote' },
+  { label: '기획안 확인', to: '/prototype/brief' },
+];
+
+// 현재 단계 인덱스 (Figma 시안 기준 — 아이디어 제출 단계)
+const CURRENT_STAGE = 0;
 
 export default function TeamHome() {
-  const navigate = useNavigate();
-  const unread = notifications.filter((n) => n.unread).length;
-  const plan = getCurrentPlan();
-  const paid = isPaidPlan(plan);
-  const planName = plans.find((p) => p.key === plan)?.name ?? 'Free';
-
-  // 일정 — 온보딩에서 저장한 값이 있으면 사용, 없으면 기본 7일 추천
-  const schedule = useMemo<ScheduledStage[]>(() => {
-    if (typeof window === 'undefined') return [];
-    try {
-      const saved = sessionStorage.getItem('weave:schedule');
-      if (saved) return JSON.parse(saved);
-    } catch {}
-    const fallbackDeadline = new Date();
-    fallbackDeadline.setDate(fallbackDeadline.getDate() + 7);
-    return recommendSchedule(fallbackDeadline.toISOString().slice(0, 10));
-  }, []);
-
-  const currentScheduleKey = stageToScheduleKey[team.stage];
-  const currentIdx = schedule.findIndex((s) => s.key === currentScheduleKey);
-  const currentStage = schedule[currentIdx] ?? schedule[0];
-  const projectDeadline = schedule[schedule.length - 1]?.deadline;
-
-  // 최근 4개 아이디어 (idx 역순)
-  const recentIdeas = useMemo(() => [...ideas].reverse().slice(0, 4), []);
-
   return (
-    <PrototypeLayout showBell bellCount={unread}>
-      {/* ========== 팀 헤더 ========== */}
-      <div className="bg-surface border border-border rounded-lg p-4 mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-[15px] font-bold text-primary-dark tracking-tighter">
-            {team.name}
-          </h2>
-          <p className="text-[11px] text-muted mt-0.5">
-            아이디어톤 · <span className="text-primary font-bold">{planName}</span> 플랜
-          </p>
-        </div>
-        {projectDeadline && (
-          <div className="flex items-center gap-1 text-[12px] text-primary font-bold bg-accent-soft px-2.5 py-1 rounded-md">
-            <Clock size={12} />
-            {toDDay(projectDeadline)}
-          </div>
-        )}
-      </div>
-
-      {/* ========== 지금 단계 CTA ========== */}
-      <button
-        onClick={() => navigate(pathByKey[currentStage.key])}
-        className="block w-full bg-primary text-paper p-4 rounded-lg flex items-center justify-between hover:opacity-90 transition-opacity mb-5 text-left"
-      >
-        <div>
-          <div className="text-[10px] uppercase tracking-wider font-bold opacity-70">
-            지금 단계 · {currentIdx + 1}/{schedule.length}
-          </div>
-          <div className="text-[16px] font-bold mt-0.5">{ctaByKey[currentStage.key]}</div>
-          <div className="text-[11px] opacity-70 mt-0.5">
-            {currentStage.label} · {toDDay(currentStage.deadline!)} 마감
-          </div>
-        </div>
-        <ArrowRight size={20} />
-      </button>
-
-      {/* ========== 진행 단계 (compact) ========== */}
-      <h3 className="text-[11px] font-bold text-muted uppercase tracking-wider mb-2 flex items-center gap-1.5">
-        <CalendarDays size={12} /> 진행
-      </h3>
-      <div className="space-y-2 mb-6">
-        {schedule.map((s, idx) => {
-          const status = idx < currentIdx ? 'done' : idx === currentIdx ? 'active' : 'pending';
-          return (
+    <div className="min-h-screen bg-paper">
+      <main className="max-w-[440px] mx-auto px-5 pt-4 pb-28">
+        {/* 헤더 */}
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-bold tracking-tight text-slate-900">배병찬</h1>
+          <div className="flex items-center gap-1">
             <Link
-              key={s.key}
-              to={status === 'pending' ? '#' : pathByKey[s.key]}
-              className={`flex items-center gap-3 p-2.5 rounded-md border transition-all ${
-                status === 'active'
-                  ? 'bg-surface border-primary shadow-sm'
-                  : status === 'done'
-                  ? 'bg-surface border-border opacity-80 hover:opacity-100'
-                  : 'bg-surface-alt border-border'
-              } ${status === 'pending' ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+              to="/prototype/notifications"
+              className="p-2 text-slate-900 hover:text-primary transition-colors"
+              aria-label="알림"
             >
-              <div
-                className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[11px] flex-shrink-0 ${
-                  status === 'done'
-                    ? 'bg-success text-white'
-                    : status === 'active'
-                    ? 'bg-primary text-paper'
-                    : 'bg-border text-muted'
-                }`}
-              >
-                {status === 'done' ? <Check size={12} strokeWidth={3} /> : idx + 1}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div
-                  className={`text-[13px] font-bold ${
-                    status === 'pending' ? 'text-muted' : 'text-primary-dark'
-                  }`}
-                >
-                  {s.label}
-                </div>
-              </div>
-              <Badge
-                variant={status === 'active' ? 'accent' : status === 'done' ? 'success' : 'default'}
-                className="!text-[10px]"
-              >
-                {toDDay(s.deadline!)}
-              </Badge>
+              <Bell size={22} />
             </Link>
-          );
-        })}
-      </div>
-
-      {/* ========== 아이디어 피드 ========== */}
-      <div className="flex items-end justify-between mb-3">
-        <h3 className="text-[11px] font-bold text-muted uppercase tracking-wider flex items-center gap-1.5">
-          <MessageSquare size={12} /> 아이디어 ({ideas.length})
-        </h3>
-        <Link to="/prototype/ideas" className="text-[11px] font-bold text-primary hover:underline">
-          전체 보기 →
-        </Link>
-      </div>
-      <div className="space-y-2 mb-6">
-        {recentIdeas.map((idea) => (
-          <Link
-            key={idea.id}
-            to={`/prototype/idea/${idea.id}`}
-            className="flex items-center gap-3 bg-surface border border-border rounded-md p-2.5 hover:border-primary/40 hover:shadow-sm transition-all"
-          >
-            <div
-              className="w-12 h-12 rounded-md flex-shrink-0 flex items-center justify-center text-xl overflow-hidden"
-              style={{ background: idea.gradient }}
+            <Link
+              to="/prototype"
+              className="p-2 text-slate-900 hover:text-primary transition-colors"
+              aria-label="메뉴"
             >
-              {idea.image ? (
-                <img src={idea.image} alt={idea.title} loading="lazy" className="w-full h-full object-cover object-top" />
-              ) : (
-                idea.emoji
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-[10px] font-bold text-primary truncate">👤 {idea.authorName}</div>
-              <div className="text-[13px] font-bold text-primary-dark truncate leading-tight">
-                {idea.title}
-              </div>
-              <div className="flex items-center gap-2.5 mt-1 text-[10px] text-muted">
-                <span className="flex items-center gap-0.5">
-                  <Star size={9} className="text-primary" /> {idea.rating}
-                </span>
-                <span className="flex items-center gap-0.5">
-                  <MessageSquare size={9} /> {idea.commentsCount}
-                </span>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
-
-      {/* ========== 팀원 ========== */}
-      <h3 className="text-[11px] font-bold text-muted uppercase tracking-wider mb-2">
-        팀원 ({members.length + 1})
-      </h3>
-      <div className="flex flex-wrap gap-2 mb-8">
-        {[{ initial: '나', color: '#3C4883', name: '나', isHost: false }, ...members.map((m) => ({
-          initial: m.initial, color: m.color, name: m.name, isHost: m.isHost,
-        }))].map((m, i) => (
-          <div
-            key={i}
-            className="flex items-center gap-1.5 bg-surface border border-border rounded-full pl-1 pr-3 py-1"
-          >
-            <Avatar initial={m.initial} color={m.color} size="sm" />
-            <span className="text-[11px] font-bold text-primary-dark">
-              {m.name}
-              {m.isHost && <span className="text-[9px] text-primary ml-1">★</span>}
-            </span>
+              <Menu size={22} />
+            </Link>
           </div>
-        ))}
-      </div>
+        </div>
 
-      {/* ========== 플로팅 액션 버튼 ========== */}
-      <FloatingActions paid={paid} />
-    </PrototypeLayout>
+        {/* 프로젝트 현황 카드 */}
+        <Card className="mt-5">
+          <div className="text-xs text-muted">멋사 해커톤 프로젝트</div>
+
+          <div className="mt-1 flex items-start justify-between gap-3">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+                아이디어 제출
+              </h2>
+              <span className="rounded-md bg-accent-soft text-primary text-xs font-semibold px-2 py-0.5">
+                Plus
+              </span>
+            </div>
+            <div className="text-right flex-shrink-0">
+              <div className="text-2xl font-bold tracking-tight text-primary-dark">
+                D-3
+              </div>
+              <div className="text-[11px] text-muted mt-0.5">
+                2026. 05. 15 (금) 마감
+              </div>
+            </div>
+          </div>
+
+          {/* 프로세스 타임라인 */}
+          <div className="mt-5">
+            <div className="text-xs text-muted mb-3">프로세스</div>
+            <StageTimeline stages={STAGES} currentIdx={CURRENT_STAGE} />
+          </div>
+        </Card>
+
+        {/* 아이디어 목록 */}
+        <section className="mt-7">
+          <div className="flex items-end justify-between mb-3">
+            <h2 className="text-lg font-bold tracking-tight text-slate-900">
+              아이디어 목록
+            </h2>
+            <Link
+              to="/prototype/ideas"
+              className="text-xs text-muted hover:text-primary-dark transition-colors"
+            >
+              더보기 ›
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            {ideas.slice(0, 6).map((idea) => (
+              <Link
+                key={idea.id}
+                to={`/prototype/idea/${idea.id}`}
+                className="aspect-square rounded-xl overflow-hidden border border-border bg-surface-alt hover:border-primary/40 transition-colors"
+                title={idea.title}
+              >
+                {idea.image ? (
+                  <img
+                    src={idea.image}
+                    alt={idea.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover object-top"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-full flex items-center justify-center text-3xl"
+                    style={{ background: idea.gradient }}
+                  >
+                    {idea.emoji}
+                  </div>
+                )}
+              </Link>
+            ))}
+          </div>
+        </section>
+      </main>
+
+      {/* FAB — AI 채팅 진입 */}
+      <Link
+        to="/prototype/chat"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-white shadow-md hover:shadow-lg flex items-center justify-center transition-shadow active:scale-95"
+        aria-label="AI 채팅"
+      >
+        <Sparkles size={24} />
+      </Link>
+    </div>
   );
 }
 
-/**
- * 우측 하단 플로팅 액션 — 아이디어 추가 + (유료) 채팅.
- * 무료 플랜이면 채팅은 자물쇠 표시로 노출 → 클릭하면 페이월(/prototype/chat) 로.
- */
-function FloatingActions({ paid }: { paid: boolean }) {
+interface StageTimelineProps {
+  stages: Stage[];
+  currentIdx: number;
+}
+function StageTimeline({ stages, currentIdx }: StageTimelineProps) {
   return (
-    <div className="fixed bottom-6 right-6 z-30 flex flex-col items-end gap-2.5">
-      <Link
-        to="/prototype/chat"
-        className={`group relative flex items-center gap-2 ${
-          paid
-            ? 'bg-surface border border-border text-primary-dark'
-            : 'bg-surface border border-dashed border-border text-muted'
-        } shadow-md rounded-full pl-3 pr-4 py-2.5 text-[12px] font-bold hover:shadow-lg transition-all`}
-        title={paid ? '팀 + AI 채팅' : '유료 플랜 전용'}
-      >
-        {paid ? (
-          <MessageCircle size={16} className="text-primary" />
-        ) : (
-          <Lock size={14} />
-        )}
-        <span>AI 채팅</span>
-        {!paid && <Badge variant="soft" className="!text-[9px] !px-1.5 !py-0">Plus</Badge>}
-      </Link>
-      <Link
-        to="/prototype/idea/new"
-        className="flex items-center gap-2 bg-primary text-paper shadow-lg rounded-full pl-3 pr-5 py-3 text-[13px] font-bold hover:shadow-xl hover:bg-primary-dark transition-all"
-      >
-        <Plus size={18} />
-        아이디어 추가
-      </Link>
+    <div className="relative flex items-start justify-between">
+      {/* 연결선 — 양 끝 도트 안쪽까지 */}
+      <div className="absolute left-3 right-3 top-[5px] h-px bg-border" />
+      {stages.map((s, i) => {
+        const isActive = i === currentIdx;
+        const isDone = i < currentIdx;
+        const filled = isActive || isDone;
+        return (
+          <Link
+            key={s.label}
+            to={s.to}
+            className="relative flex flex-col items-center gap-1.5 z-10 flex-1 group"
+          >
+            <span
+              className={`block w-2.5 h-2.5 rounded-full ring-4 ring-white ${
+                filled ? 'bg-primary' : 'bg-border'
+              }`}
+            />
+            <span
+              className={`text-[11px] tracking-tight text-center ${
+                isActive
+                  ? 'text-primary-dark font-bold'
+                  : 'text-muted group-hover:text-primary-dark'
+              }`}
+            >
+              {s.label}
+            </span>
+          </Link>
+        );
+      })}
     </div>
   );
 }
