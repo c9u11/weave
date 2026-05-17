@@ -10,6 +10,7 @@ import Launcher from './pages/prototype/Launcher';
 import Splash from './pages/prototype/Splash';
 import Landing from './pages/prototype/Landing';
 import Onboarding from './pages/prototype/Onboarding';
+import OnboardingReady from './pages/prototype/OnboardingReady';
 import PlanSelect from './pages/prototype/PlanSelect';
 import Invite from './pages/prototype/Invite';
 import Join from './pages/prototype/Join';
@@ -40,6 +41,7 @@ function App() {
         <Route path="/prototype/splash" element={<Splash />} />
         <Route path="/prototype/landing" element={<Landing />} />
         <Route path="/prototype/onboarding" element={<Onboarding />} />
+        <Route path="/prototype/onboarding/ready" element={<OnboardingReady />} />
         <Route path="/prototype/plan" element={<PlanSelect />} />
         <Route path="/prototype/invite" element={<Invite />} />
         <Route path="/prototype/join" element={<Join />} />
