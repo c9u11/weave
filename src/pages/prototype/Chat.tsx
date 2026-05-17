@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Menu, Sparkles } from 'lucide-react';
+import { ArrowLeft, Menu, Sparkles, ArrowRight } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
 
 /**
  * AI 채팅 (Figma "AI 채팅.png").
@@ -146,6 +147,34 @@ export default function Chat() {
             </p>
           );
         })}
+        {/* 기획안 생성 후 진입 CTA — 마지막 status 가 '기획안 생성 중' 이면 노출 */}
+        {items[items.length - 1]?.text === 'AI 기획안 생성 중' && (
+          <Button
+            variant="primary"
+            size="lg"
+            fullWidth
+            rightIcon={<ArrowRight size={18} />}
+            onClick={() => {
+              // IdeaEdit 신규 모드에 prefill 데이터 전달
+              const draft = {
+                problem:
+                  '일정이 카톡·포스터·메모에 흩어져 있어 일일이 캘린더에 옮기기 번거롭고, 약속 조율 같은 반복 선택에서 결정 피로가 쌓인다.',
+                feature:
+                  '공유·이미지·음성만 하면 자동 일정 생성 / 여러 일정 비교 후 최적 시간 추천 / 생활패턴 학습 기반 시간 제안',
+                target: '일정 많은 대학생·직장인, 팀 단위 사용자',
+                differentiator:
+                  '입력을 없앤다(쓰는 게 아니라 넘기면 끝) / 결정을 대신한다(추천이 아니라 확정까지) / 앱이 필요 없다(공유·드래그·음성 UX)',
+                risk:
+                  '메신저·캘린더 연동 권한 / 잘못된 자동 확정에 대한 신뢰 / 기존 캘린더·일정 앱과의 경쟁',
+              };
+              sessionStorage.setItem('weave:draftFromChat', JSON.stringify(draft));
+              navigate('/prototype/idea/new');
+            }}
+          >
+            기획안 확인하기
+          </Button>
+        )}
+
         <div ref={endRef} />
       </main>
 

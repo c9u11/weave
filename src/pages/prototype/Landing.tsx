@@ -1,5 +1,4 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { MessageCircle } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { WeaveMark } from '../../components/brand/WeaveMark';
 
@@ -25,43 +24,76 @@ export default function Landing() {
         ← 프로토타입 메뉴
       </Link>
 
-      {/* 중앙 로고 영역 */}
+      {/* 중앙 로고 영역 — 파도가 좌→우로 흘러 들어오는 진입 애니메이션 */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
-        <WeaveMark className="w-[140px] h-auto text-white" />
-        <h1 className="mt-5 text-[40px] font-bold tracking-tight text-white">
+        <WeaveMark className="landing-mark w-20 h-auto text-white" />
+        <h1 className="landing-label mt-4 text-[32px] font-bold tracking-tight text-white">
           Weave
         </h1>
       </div>
 
-      {/* 하단 로그인 버튼들 */}
+      {/* 하단 로그인 버튼들 — 순차 페이드 업 */}
       <div className="px-5 pb-8 space-y-3">
-        <Button
-          variant="google"
-          fullWidth
-          size="lg"
-          leftIcon={<GoogleGlyph />}
-          onClick={() => navigate('/prototype/onboarding')}
-        >
-          구글 계정 로그인
-        </Button>
-        <Button
-          variant="kakao"
-          fullWidth
-          size="lg"
-          leftIcon={<MessageCircle size={20} fill="currentColor" />}
-          onClick={() => navigate('/prototype/onboarding')}
-        >
-          카카오 로그인
-        </Button>
+        <div className="landing-cta-1">
+          <Button
+            variant="google"
+            fullWidth
+            size="lg"
+            leftIcon={
+              <span className="w-6 flex items-center justify-center">
+                <GoogleGlyph />
+              </span>
+            }
+            onClick={() => navigate('/prototype/onboarding')}
+          >
+            구글 계정 로그인
+          </Button>
+        </div>
+        <div className="landing-cta-2">
+          <Button
+            variant="kakao"
+            fullWidth
+            size="lg"
+            leftIcon={
+              <span className="w-6 flex items-center justify-center">
+                <KakaoGlyph />
+              </span>
+            }
+            onClick={() => navigate('/prototype/onboarding')}
+          >
+            카카오 로그인
+          </Button>
+        </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * 카카오 로그인 공식 심볼 (말풍선).
+ * 가이드: https://developers.kakao.com/docs/latest/ko/kakaologin/design-guide
+ * - rounded-square 본체 + 우측 하단 tail
+ * - fill: #181600 (텍스트 컬러와 동일, 85% black 효과)
+ */
+function KakaoGlyph() {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="currentColor"
+      aria-hidden
+    >
+      <path d="M12 3C6.48 3 2 6.58 2 10.99c0 2.84 1.86 5.33 4.65 6.77-.2.74-.74 2.74-.85 3.17-.13.55.2.55.42.4.18-.12 2.84-1.93 3.99-2.72.59.09 1.18.13 1.79.13 5.52 0 10-3.58 10-7.75C22 6.58 17.52 3 12 3z" />
+    </svg>
   );
 }
 
 function GoogleGlyph() {
   // Google "G" 색상 글리프 (4색)
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+    <svg width="18" height="18" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
       <path
         fill="#4285F4"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.27-4.74 3.27-8.1Z"

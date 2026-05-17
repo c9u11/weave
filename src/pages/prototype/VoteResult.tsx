@@ -1,8 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Trophy, EyeOff, RotateCcw } from 'lucide-react';
+import { ArrowLeft, Trophy, RotateCcw } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
-import { Card } from '../../components/ui/Card';
 import { ideas, type Idea } from '../../prototype/data';
 
 /**
@@ -70,16 +69,9 @@ export default function VoteResult() {
           순위만 공개해요. 누가 무엇에 표를 던졌는지·득표수는 비공개.
         </p>
 
-        <Card tone="soft" className="mt-4 !p-4 flex items-start gap-3">
-          <EyeOff size={16} className="text-primary flex-shrink-0 mt-0.5" />
-          <p className="text-xs text-primary-dark leading-relaxed">
-            득표수는 보여주지 않아요. 1·2·3 등만 표시하고, 4위부터는 한 줄로.
-          </p>
-        </Card>
-
         {/* 1위 hero */}
         {winner && (
-          <div className="mt-5 bg-white border-2 border-primary rounded-2xl overflow-hidden">
+          <div className="mt-6 bg-white border-2 border-primary rounded-2xl overflow-hidden">
             <div className="px-3 pt-3">
               <div
                 className="relative aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt flex items-center justify-center text-6xl"

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Bell, Menu, Sparkles } from 'lucide-react';
+import { Bell, Menu } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { ideas } from '../../prototype/data';
 
@@ -55,19 +55,21 @@ export default function TeamHome() {
 
         {/* 프로젝트 현황 카드 */}
         <Card className="mt-5">
-          <div className="text-xs text-muted">멋사 해커톤 프로젝트</div>
+          {/* 행 1: 프로젝트명 + Plus 배지 */}
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-muted">멋사 해커톤 프로젝트</div>
+            <span className="rounded-md bg-accent-soft text-primary text-xs font-semibold px-2 py-0.5">
+              Plus
+            </span>
+          </div>
 
-          <div className="mt-1 flex items-start justify-between gap-3">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900">
-                아이디어 제출
-              </h2>
-              <span className="rounded-md bg-accent-soft text-primary text-xs font-semibold px-2 py-0.5">
-                Plus
-              </span>
-            </div>
+          {/* 행 2: 현재 단계 + D-day */}
+          <div className="mt-2 flex items-start justify-between gap-3">
+            <h2 className="text-2xl font-bold tracking-tight text-slate-900">
+              아이디어 제출
+            </h2>
             <div className="text-right flex-shrink-0">
-              <div className="text-2xl font-bold tracking-tight text-primary-dark">
+              <div className="text-2xl font-bold tracking-tight text-primary">
                 D-3
               </div>
               <div className="text-[11px] text-muted mt-0.5">
@@ -76,7 +78,7 @@ export default function TeamHome() {
             </div>
           </div>
 
-          {/* 프로세스 타임라인 */}
+          {/* 행 3: 프로세스 타임라인 */}
           <div className="mt-5">
             <div className="text-xs text-muted mb-3">프로세스</div>
             <StageTimeline stages={STAGES} currentIdx={CURRENT_STAGE} />
@@ -126,13 +128,14 @@ export default function TeamHome() {
         </section>
       </main>
 
-      {/* FAB — AI 채팅 진입 */}
+      {/* FAB — AI 채팅 진입. ai.png 글리프 + 흰 배경 + 푸른 그림자 */}
       <Link
         to="/prototype/chat"
-        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-primary text-white shadow-md hover:shadow-lg flex items-center justify-center transition-shadow active:scale-95"
+        className="fixed bottom-6 right-6 w-14 h-14 rounded-full bg-white border border-border flex items-center justify-center transition-transform active:scale-95"
+        style={{ boxShadow: '0 8px 24px rgba(60, 72, 131, 0.18)' }}
         aria-label="AI 채팅"
       >
-        <Sparkles size={24} />
+        <img src="/ai.png" alt="AI" className="w-7 h-7" />
       </Link>
     </div>
   );

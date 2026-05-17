@@ -1,46 +1,56 @@
 import { useState } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Heart, MessageSquare } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Heart, MessageSquare, Pencil, X } from 'lucide-react';
 import { ideas, type Comment } from '../../prototype/data';
 import { Avatar } from '../../components/ui/Avatar';
 
 /**
  * 아이디어 상세 (Figma "아이디어 상세.png" / "아이디어 상세-1.png").
- * - 헤더: back chevron
+ * - 헤더: back + 우측 "수정" 버튼
  * - 타이틀 + 작성자 행
- * - 이미지 갤러리 (가로 스크롤)
- * - 본문 섹션: 아이디어 설명 / 핵심 기능 / 타깃 / 차별성 / 리스크
- * - 하단 액션 바: 좋아요 + 댓글 카운트
- * - 댓글 클릭 시 BottomSheet 으로 댓글 목록 노출
+ * - 가로 스크롤 이미지 갤러리 (클릭 시 라이트박스)
+ * - 5 섹션 본문 (설명/기능/타깃/차별성/리스크)
+ * - 하단 고정 액션 바: 좋아요 + 댓글 카운트
+ * - 댓글 클릭 시 BottomSheet 슬라이드 업
  */
-
-const HEART_COUNT = 6;
-
 export default function IdeaDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const idea = ideas.find((i) => i.id === id) ?? ideas[0];
   const [sheetOpen, setSheetOpen] = useState(false);
   const [liked, setLiked] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
 
-  // organized 필드를 ' / ' 기준으로 bullet 리스트화
   const featureBullets = splitBullets(idea.organized.feature);
   const targetBullets = splitBullets(idea.organized.target);
   const differentiatorBullets = splitBullets(idea.organized.differentiator);
   const riskBullets = splitBullets(idea.organized.risk);
 
+  // 시연용: 단일 이미지를 3번 반복해서 갤러리 느낌
+  const galleryImages = idea.image ? [idea.image, idea.image, idea.image] : [];
+
   return (
     <div className="min-h-screen bg-paper">
       <main className="max-w-[440px] mx-auto px-5 pt-3 pb-28">
-        <button
-          onClick={() => navigate(-1)}
-          className="-ml-2 p-2 text-slate-900 hover:text-primary transition-colors"
-          aria-label="뒤로"
-        >
-          <ArrowLeft size={24} />
-        </button>
+        <div className="flex items-center justify-between">
+          <button
+            onClick={() => navigate(-1)}
+            className="-ml-2 p-2 text-slate-900 hover:text-primary transition-colors"
+            aria-label="뒤로"
+          >
+            <ArrowLeft size={24} />
+          </button>
+          <button
+            onClick={() => navigate(`/prototype/idea/${idea.id}/edit`)}
+            className="-mr-2 p-2 text-slate-900 hover:text-primary transition-colors inline-flex items-center gap-1 text-sm font-semibold"
+            aria-label="수정"
+          >
+            <Pencil size={16} />
+            수정
+          </button>
+        </div>
 
-        <h1 className="mt-3 text-[22px] font-bold tracking-tight text-slate-900">
+        <h1 className="mt-2 text-[22px] font-bold tracking-tight text-slate-900">
           {idea.title}
         </h1>
 
@@ -49,15 +59,25 @@ export default function IdeaDetail() {
           <span className="text-sm font-semibold text-slate-900">{idea.authorName}</span>
         </div>
 
-        {/* 이미지 갤러리 — 가로 스크롤 */}
+        {/* 가로 스크롤 갤러리 */}
         <div className="mt-5 -mx-5 px-5 overflow-x-auto">
           <div className="flex gap-2 snap-x snap-mandatory pb-2">
-            {idea.image ? (
-              <>
-                <GalleryCard src={idea.image} alt={idea.title} />
-                <GalleryCard src={idea.image} alt={idea.title} dim />
-                <GalleryCard src={idea.image} alt={idea.title} dim />
-              </>
+            {galleryImages.length > 0 ? (
+              galleryImages.map((src, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => setLightboxSrc(src)}
+                  className="snap-start shrink-0 w-[280px] aspect-[4/3] rounded-xl border border-border overflow-hidden bg-surface-alt"
+                  aria-label="이미지 크게 보기"
+                >
+                  <img
+                    src={src}
+                    alt={idea.title}
+                    loading="lazy"
+                    className="w-full h-full object-cover object-top"
+                  />
+                </button>
+              ))
             ) : (
               <div
                 className="snap-start shrink-0 w-[280px] aspect-[4/3] rounded-xl border border-border flex items-center justify-center text-6xl"
@@ -67,15 +87,6 @@ export default function IdeaDetail() {
               </div>
             )}
           </div>
-        </div>
-
-        <div className="mt-2 text-right">
-          <Link
-            to={`/prototype/idea/${idea.id}/edit`}
-            className="text-xs text-muted hover:text-primary-dark transition-colors"
-          >
-            더 자세히 보기 →
-          </Link>
         </div>
 
         {/* 본문 섹션들 */}
@@ -112,7 +123,7 @@ export default function IdeaDetail() {
               size={20}
               className={liked ? 'fill-danger text-danger' : ''}
             />
-            {HEART_COUNT + (liked ? 1 : 0)}
+            {idea.likes + (liked ? 1 : 0)}
           </button>
           <button
             onClick={() => setSheetOpen(true)}
@@ -131,15 +142,15 @@ export default function IdeaDetail() {
           onClose={() => setSheetOpen(false)}
         />
       )}
+
+      {lightboxSrc && (
+        <Lightbox src={lightboxSrc} onClose={() => setLightboxSrc(null)} />
+      )}
     </div>
   );
 }
 
-interface SectionProps {
-  title: string;
-  children: React.ReactNode;
-}
-function Section({ title, children }: SectionProps) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mt-7">
       <h2 className="text-lg font-bold tracking-tight text-slate-900">{title}</h2>
@@ -161,22 +172,6 @@ function BulletList({ items }: { items: string[] }) {
   );
 }
 
-function GalleryCard({ src, alt, dim }: { src: string; alt: string; dim?: boolean }) {
-  return (
-    <div
-      className={`snap-start shrink-0 w-[280px] aspect-[4/3] rounded-xl border border-border overflow-hidden bg-surface-alt ${
-        dim ? 'opacity-90' : ''
-      }`}
-    >
-      <img src={src} alt={alt} loading="lazy" className="w-full h-full object-cover object-top" />
-    </div>
-  );
-}
-
-/**
- * 댓글 시트 — 배경 dim + 하단에서 올라오는 시트.
- * 시안에는 시트가 화면 ~60% 차지하고 댓글 목록 + 하단 입력.
- */
 interface CommentSheetProps {
   comments: Comment[];
   authorName: string;
@@ -185,16 +180,12 @@ interface CommentSheetProps {
 function CommentSheet({ comments, authorName, onClose }: CommentSheetProps) {
   return (
     <div className="fixed inset-0 z-40">
-      {/* dim */}
       <button
         aria-label="닫기"
         onClick={onClose}
-        className="absolute inset-0 bg-slate-900/40"
+        className="sheet-backdrop-enter absolute inset-0 bg-slate-900/40"
       />
-
-      {/* sheet */}
-      <div className="absolute bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white rounded-t-3xl shadow-lg max-h-[85vh] flex flex-col">
-        {/* drag handle */}
+      <div className="sheet-enter absolute bottom-0 left-0 right-0 max-w-[440px] mx-auto bg-white rounded-t-3xl shadow-lg max-h-[85vh] flex flex-col">
         <div className="pt-3 pb-1 flex justify-center">
           <button
             aria-label="시트 닫기"
@@ -207,7 +198,6 @@ function CommentSheet({ comments, authorName, onClose }: CommentSheetProps) {
           <h2 className="text-lg font-bold tracking-tight text-slate-900">댓글</h2>
         </div>
 
-        {/* 댓글 목록 */}
         <div className="flex-1 overflow-y-auto px-5 pb-2 space-y-5">
           {comments.map((c) => {
             const isAuthor = c.authorName === authorName;
@@ -239,7 +229,6 @@ function CommentSheet({ comments, authorName, onClose }: CommentSheetProps) {
           })}
         </div>
 
-        {/* 댓글 입력 — 자기 아바타 + input */}
         <div className="border-t border-border px-5 py-3 flex items-center gap-3 bg-white">
           <Avatar initial="나" color="#3C4883" size="sm" className="!w-9 !h-9 !text-[13px] flex-shrink-0" />
           <input
@@ -249,6 +238,30 @@ function CommentSheet({ comments, authorName, onClose }: CommentSheetProps) {
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+function Lightbox({ src, onClose }: { src: string; onClose: () => void }) {
+  return (
+    <div className="fixed inset-0 z-50 bg-slate-900/90 sheet-backdrop-enter flex items-center justify-center p-6">
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/10 text-white flex items-center justify-center hover:bg-white/20 transition-colors"
+        aria-label="닫기"
+      >
+        <X size={20} />
+      </button>
+      <button
+        onClick={onClose}
+        className="absolute inset-0"
+        aria-label="배경 클릭으로 닫기"
+      />
+      <img
+        src={src}
+        alt="확대 보기"
+        className="lightbox-enter relative max-w-full max-h-full object-contain rounded-xl"
+      />
     </div>
   );
 }

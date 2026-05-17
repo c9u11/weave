@@ -75,13 +75,13 @@ export default function Vote() {
         <ProgressBar value={progress} className="mt-4" />
 
         {current && (
-          <div className="mt-6 space-y-4">
+          <div className="mt-5 space-y-3">
             <VoteCard idea={current.a} onPick={() => pick(current.a.id)} />
             <VoteCard idea={current.b} onPick={() => pick(current.b.id)} />
           </div>
         )}
 
-        <div className="mt-8 text-center">
+        <div className="mt-5 text-center">
           <button
             onClick={skip}
             className="text-sm text-muted hover:text-primary-dark transition-colors"
@@ -100,9 +100,9 @@ function VoteCard({ idea, onPick }: { idea: Idea; onPick: () => void }) {
       onClick={onPick}
       className="block w-full text-left bg-white border border-border rounded-2xl overflow-hidden hover:border-primary/40 transition-colors active:scale-[0.99]"
     >
-      <div className="px-3 pt-3">
+      <div className="px-2 pt-2">
         <div
-          className="aspect-[4/3] rounded-xl overflow-hidden bg-surface-alt flex items-center justify-center text-6xl"
+          className="aspect-[16/9] rounded-xl overflow-hidden bg-surface-alt flex items-center justify-center text-4xl"
           style={{ background: idea.image ? undefined : idea.gradient }}
         >
           {idea.image ? (
@@ -117,11 +117,11 @@ function VoteCard({ idea, onPick }: { idea: Idea; onPick: () => void }) {
           )}
         </div>
       </div>
-      <div className="p-5">
-        <h2 className="text-lg font-bold tracking-tight text-slate-900">
+      <div className="p-4">
+        <h2 className="text-base font-bold tracking-tight text-slate-900">
           {idea.title}
         </h2>
-        <p className="mt-2 text-sm text-slate-900 leading-7">
+        <p className="mt-1.5 text-sm text-slate-900/85 leading-relaxed line-clamp-2">
           {idea.organized.problem}
         </p>
       </div>
